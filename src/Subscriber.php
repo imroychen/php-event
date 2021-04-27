@@ -3,7 +3,7 @@ namespace ir\e;
 
 /**
  * Class Base
- * @package lm\e
+ * @package ir\e
  */
 class Subscriber
 {

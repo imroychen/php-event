@@ -3,7 +3,7 @@ namespace ir\e;
 
 /**
  * Class Pool
- * @package lm\e
+ * @package ir\e
  */
 class Pool
 {

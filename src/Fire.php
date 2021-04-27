@@ -4,7 +4,7 @@
 namespace ir\e;
 /**
  * Class Fire
- * @package lm\e
+ * @package ir\e
  *
  * @example ./README.md *
  */
