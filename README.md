@@ -30,7 +30,7 @@ ir\e\App::setCfg([
      'temp_path'=>'/tmp',//项目可写入的临时目录， 可选 默认系统的临时目录
      'event'=>'',//事件配置Class
      'store_driver'=>'\\app\event\\Driver',//事件消息存储仓库
-     'subscribers'=>'callback | string (auto:subscriber绝对目录)'
+     'subscribers'=>'callback | string (files:subscriber绝对目录/*.php)'
 ]);
 ```
 
@@ -39,7 +39,7 @@ ir\e\App::setCfg([
     内置驱动使用方法：'store_driver'=>'@Tp5Db:event_store', 表示使用内置的驱动（Tp5Db）参数(表)为event_store
     
 ##### subscribers: 
-callback | string 如:auto:subscriber目录(会自动去subscriber目录中的代码中分析出来)
+callback | string 如:files:subscriber目录/*.php(会自动从这些文件的代码中分析出来Class全名)
 ```php
 //callback
 function(){
@@ -50,19 +50,15 @@ function(){
         return $result;
 }
 
-//string 格式：(auto:subscriber目录) 如下示例:
-'auto:'.__DIR__.'/subscriber/';
+//string 格式：(files:subscriber目录/*) 如下示例:
+'auto:'.__DIR__.'/subscriber/*.php';
 ```
 
 ## 事件消息存储 
-1.mysql
-```sql
+1.mysql :sql 请参考<u>/src/drivers/RADME.md<u>
 
-```
-2.Redis
-```sql
+2.Redis :请参考<u>/src/drivers/RADME.md</u>
 
-```
 
 ## 使用方法
 

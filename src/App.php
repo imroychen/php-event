@@ -5,6 +5,14 @@ namespace ir\e;
 
 class App
 {
+    /**
+     * @var array [
+     *      temp_path=>'临时目录 需可写'
+     *      store_driver=>'存储器的驱动Class ./drivers/Driver.php'
+     *      subscribers=> callback | fiels:绝对路径/*
+     *      event=>'事件配置文件'
+     * ]
+     */
     static private  $_cfg = [];
     static public function setCfg($cfg){
         if(!empty($cfg)) {

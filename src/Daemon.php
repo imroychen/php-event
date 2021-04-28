@@ -16,7 +16,7 @@ class Daemon
         $status = true;
         $this->_timeout = time()+$limitTime;
         $this->_enableTimeoutCtrl = ($limitTime>0);
-        $this->_listeners = self::getListeners();
+        //$this->_listeners = self::getListeners();放在首次有任务的时候计算
 
         while ($status){
             $status = self::_runItem();
@@ -49,6 +49,9 @@ class Daemon
     private function _runItem(){
         $task = Pool::scan();
         if($task){
+            if(empty($this->_listeners)){
+                $this->_listeners = self::getListeners();
+            }
             $eventName = $task['name'];
             $listeners = $this->_listeners[strtolower($eventName)];
 
@@ -108,9 +111,9 @@ class Daemon
 
         $subscribers = [];
         $subscribersCfg = App::cfg('subscribers');
-        if(is_string($subscribersCfg) && strpos($subscribersCfg,'auto:')===0){
-            $path = str_replace('^auto:','','^'.$subscribersCfg);
-            $files = glob($path.'/*.php');
+        if(is_string($subscribersCfg) && strpos($subscribersCfg,'files:')===0){
+            $path = str_replace('^files:','','^'.$subscribersCfg);
+            $files = glob($path);
             //获取订阅这列表
             foreach ($files as $f){
                 //开始分析该订阅者的监听器
