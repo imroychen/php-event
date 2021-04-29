@@ -1,19 +1,25 @@
 #内置驱动
 1. mysql：该驱动 不可直接使用 需要你自己创建一个class 去实现 method _query 和 _exec两个方法
 
-1. Redis
+1. Redis _<u>Redis:host=localhost;port=3307;dataset=key</u>_
 
-1. 如果使用了框架thinkphp 3.* 且准备使用数据库作为事件消息存储 你可以直接使用Tp3Db驱动 用法'<u>@Tp3Db:</u>'
+1. File _<u>File:path=绝对路径</u>_
 
-1. 同上 thinkphp 5.* 或者 6.* 使用Tp5Db 或者 Tp6Db
+1. 如果使用了框架thinkphp 3.* 且准备使用数据库作为事件消息存储 你可以直接使用Tp3Db驱动 用法'<u>@Tp3Db:表名</u>'
 
-1. 更多内置驱动请参考该目录下的文件名
+1. 同上 thinkphp 5.* 或者 6.* 使用_<u>Tp5Db</u>_ 或者 _<u>Tp6Db</u>_
+
+1. 更多内置驱动参考代码
  
 # 自定义驱动
 只要自己定义个Class 代码如下
 ```php
-class MyDriver implements Driver{
-        public function __construct($args){
+class MyDriver extends Driver{
+        /**
+         * @param array $args 编码后的参数 如:['host'=>'',....]
+         * @param $rawArgs 原始的参数 如:host=127.0.0.1;port=....
+         */
+        protected function _init($args,$rawArgs){
             //$this->_args = $args;
         }
  

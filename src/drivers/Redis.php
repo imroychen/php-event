@@ -5,23 +5,26 @@ namespace ir\e\drivers;
 
 /**
  * Redis 驱动
- * 该驱动不能直接使用，需要继承后自己去实现 _query和 _exec两个方法
  * @package ir\e\drivers
+ * @example new Redis('host=localhost;port=3307;dataset=ir-e-store')
  */
-abstract class Redis implements Driver
+class Redis extends Driver
 {
     protected $_dataset, $_dataset_bak;
     protected $_redis;
 
 
-    public function __construct($args)
+    /**
+     * Redis constructor.
+     * @param array $args
+     * @param string $rawArgs 'host=localhost;port=3307;dataset=ir-e-store'
+     */
+    protected function _init($args,$rawArgs)
     {
-        $this->_dataset = 'ir-e-store';
+        $this->_dataset = (isset($args['dataset']) && !empty($args['dataset']))? preg_replace('[^\w\-]','',$args['dataset']):'ir-e-store';
         $this->_dataset_bak = $this->_dataset.'-bak';
-
-        if ($args != '') {
-            $this->_table = $args;
-        }
+        $this->_redis = new \Redis();
+        $this->_redis->connect($args['host'], $args['port']);
     }
 
     /**

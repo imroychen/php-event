@@ -7,20 +7,19 @@ namespace ir\e\drivers;
  * Tp3.*下使用数据为存储仓库
  */
 
-class Tp3Db
+class Tp3Db extends Driver
 {
 
     private $_table = 'event_pool';
 
     /**
-     * Tp5Db constructor.
-     * @param string $args
+     * @param array $args
+     * @param string $rawArgs
      */
-    public function __construct($args)
+
+    protected function _init($args, $rawArgs)
     {
-        if($args != '') {
-            $this->_table = $args;
-        }
+        $this->_table = $rawArgs;
     }
 
     private function _m(){

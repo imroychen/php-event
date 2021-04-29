@@ -1,12 +1,21 @@
 <?php
 namespace ir\e\drivers;
-interface Driver
+abstract class Driver
 {
     /**
      * Driver constructor.
      * @param string $args
      */
-    function __construct($args);
+    function __construct($rawArgs){
+        $_argsArr = explode(';',$rawArgs);
+        $args = [];
+        foreach ($_argsArr as $item){
+            $tmp = explode('=',$item.'=');
+            $args[trim($tmp[0])] = trim($tmp[1]);
+        }
+        return $this->_init($args,$rawArgs);
+    }
+    abstract protected function _init($args,$rawArgs);
 
     /**
      * 获取指定的数据
@@ -14,7 +23,7 @@ interface Driver
      * @return mixed false|['id'=>int, 'name'=>'string name'...]
      */
 
-    function get($id);
+    abstract function get($id);
 
     /**
      * 移除一条数据
@@ -22,7 +31,7 @@ interface Driver
      * @return bool
      */
 
-    function remove($id);
+    abstract function remove($id);
 
     /**
      * 保存一条数据
@@ -38,7 +47,7 @@ interface Driver
      * @return int id
      */
 
-    function create($data);
+    abstract function create($data);
 
     /**
      * 检查数据是否存在
@@ -46,7 +55,7 @@ interface Driver
      * @return int 0|id
      */
 
-    function isExist($sign);
+    abstract function isExist($sign);
 
     /**
      * 修改指定 ID 数据的 starting_time值
@@ -55,5 +64,5 @@ interface Driver
      * @return bool
      */
 
-    function setStartingTime($id, $time);
+    abstract function setStartingTime($id, $time);
 }

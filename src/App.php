@@ -22,7 +22,7 @@ class App
 
             if (isset($cfg['store_driver'])) {
                 if ($cfg['store_driver'][0] === '@') {
-                    $cfg['store_driver'] = __NAMESPACE__ . '\\drivers';
+                    $cfg['store_driver'] = str_replace('^@',__NAMESPACE__ . '\\drivers\\','^'.$cfg['store_driver']);
                 }
             }
 

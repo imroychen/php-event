@@ -9,7 +9,7 @@ namespace ir\e\drivers;
  * @package ir\e\drivers
  */
 
-abstract class Mysql implements Driver
+abstract class Mysql extends Driver
 {
     protected $_table='event_pool';
 
@@ -26,13 +26,12 @@ abstract class Mysql implements Driver
 
     abstract protected function _exec($sql);
 
-
     /**
-     * @param string $args
-     *
+     * @param array $args
+     * @param string $rawArgs
      */
 
-    public function __construct($args)
+    protected function _init($args,$rawArgs)
     {
         if($args != '') {
             $this->_table = $args;

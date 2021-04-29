@@ -11,7 +11,8 @@ require (dirname(__DIR__)).'/start.php';
 e\App::setCfg([
     'subscribers'=>'files:'.__DIR__.'/subscriber',
     'event'=>'\\MyNamespace\\Event',
-    'store_driver'=>'\\MyNamespace\\Driver',
+     //'store_driver'=>'\\MyNamespace\\Driver',
+    'store_driver'=>'@File:path='.__DIR__.'/file_store',    //事件消息存储仓库驱动
     //'temp_path'=>'/tmp',//项目可写入的临时目录， 可选 默认系统的临时目录
 ]);
 

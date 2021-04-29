@@ -15,20 +15,19 @@ use think\Exception;
 use think\exception\DbException;
 use think\exception\PDOException;
 
-class Tp5Db implements Driver
+class Tp5Db extends Driver
 {
 
     private $_table = 'event_pool';
 
     /**
-     * Tp5Db constructor.
-     * @param string $args
+     * @param array $args
+     * @param string $rawArgs
      */
-    public function __construct($args)
+
+    protected function _init($args, $rawArgs)
     {
-        if($args != '') {
-            $this->_table = $args;
-        }
+        $this->_table = $rawArgs;
     }
 
     /**

@@ -18,7 +18,7 @@ class Pool
             $driver = explode(':', App::cfg('store_driver'));
             $cls = $driver[0];
             unset($driver[0]);
-            $args = count($driver) > 0 ? import(':', $driver) : '';
+            $args = count($driver) > 0 ? implode(':', $driver) : '';
             self::$_driver = new $cls($args);
         }
         return self::$_driver;
