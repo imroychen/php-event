@@ -9,6 +9,19 @@ namespace ir\e\drivers;
  * @package ir\e\drivers
  */
 
+/*
+ CREATE TABLE IF NOT EXISTS `ir_event_pool` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) NOT NULL,
+  `starting_time` int(11) NOT NULL,
+  `sign` varchar(32) NOT NULL,
+  `dependency` int(11) NOT NULL DEFAULT 0,
+  `cfg` text NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `starting_time` (`starting_time`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+*/
+
 abstract class Mysql extends Driver
 {
     protected $_table='event_pool';
@@ -86,6 +99,7 @@ abstract class Mysql extends Driver
      *
      *        //'listener'=>'',     *
      *        'dependency'=>'',
+     *         'starting_time'
      *        'cfg'=>[]
      *    ];
      * @return int
