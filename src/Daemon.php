@@ -26,7 +26,7 @@ class Daemon
                 while (1){
                     $mark = Pool::getMark();//避免数据库过载
                     if($mark>time()) {
-                        sleep(3);
+                        sleep(1);
                         echo date('H:i:s')."\r";
                     }else{
                         echo "发现新任务\r\n";
@@ -51,11 +51,13 @@ class Daemon
         if($task){
             if(empty($this->_listeners)){
                 $this->_listeners = self::getListeners();
+                $this->_listeners['__']='';//防止没有数据每次都重新分析
             }
             $eventName = $task['name'];
-            $listeners = $this->_listeners[strtolower($eventName)];
-
-            $tracking = Pool::getRuntimeTracking();
+            $nameLower = strtolower($eventName);
+            $listeners = (isset($this->_listeners[$nameLower])&& is_array($this->_listeners[$nameLower]))? $this->_listeners[$nameLower]: [];
+            echo 'Listeners:'.(empty($listeners)?'none':implode(',',array_keys($listeners)));
+            $tracking = Pool::getRuntimeTracking($task['id']);//如果上次意外退出，接着上次继续运行
             $progress = array_flip($listeners);//记录进度
             $event = new Event($task['name'],$task['args']);
 
@@ -100,7 +102,7 @@ class Daemon
         }
         $clsName = '';
         if(stripos($code,'class')) {
-            preg_match('%(^|\n)\s*class\s+([\w]+)\W;%i', $code, $matches);
+            preg_match('%(^|\n)\s*class\s+([\w]+)\W%i', $code, $matches);
             $clsName = $matches[2];
         }
         return $ns.'\\'.$clsName;
@@ -117,7 +119,7 @@ class Daemon
             //获取订阅这列表
             foreach ($files as $f){
                 //开始分析该订阅者的监听器
-                $subscribers[] = self::_getClsByFilePath($f);
+                if($f) $subscribers[] = self::_getClsByFilePath($f);
             }
         }elseif(is_callable($subscribersCfg)){
             $subscribers = call_user_func($subscribersCfg);

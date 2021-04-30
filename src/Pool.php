@@ -20,6 +20,7 @@ class Pool
             unset($driver[0]);
             $args = count($driver) > 0 ? implode(':', $driver) : '';
             self::$_driver = new $cls($args);
+            self::resetRuntimeTracking(0);
         }
         return self::$_driver;
     }
@@ -40,6 +41,7 @@ class Pool
 	 */
 
 	static function remove($id){
+	    self::resetRuntimeTracking($id);
         return self::_driver()->remove($id);
 	}
 
@@ -86,24 +88,40 @@ class Pool
 		return self::_driver()->setStartingTime($poolId,$time);
 	}
 
-	static function getRuntimeTracking(){
-	    $text = file_get_contents(App::cfg('temp_path').DIRECTORY_SEPARATOR.'event_runtime_tracking');
+    /**
+     * @param string $id 事件ID
+     * @return array
+     */
+
+	static function getRuntimeTracking($id){
+        $file = App::cfg('temp_path') . DIRECTORY_SEPARATOR . 'event_runtime_tracking';
+        $text = file_get_contents($file);
 	    $list = explode("\n",$text);
 	    $r = [];
 	    foreach ($list as $v){
 	        if($v!='' && strpos($v,',')) {
-                list(, $listener,$status) = explode(',', $v);
-                $r[$listener] = $status;
+                list($id, $listener,$status) = explode(',', $v);
+                $r[$id][$listener] = $status;
             }
         }
-	    return $r;
+	    return isset($r[$id])? $r[$id]:[];
 
     }
 	static function setRuntimeTracking($id,$listener,$status = 1){
-	    file_put_contents(App::cfg('temp_path').DIRECTORY_SEPARATOR.'event_runtime_tracking',"\n".$id.','.$listener.','.$listener.','.$status,FILE_APPEND);
+	    file_put_contents(App::cfg('temp_path').DIRECTORY_SEPARATOR.'event_runtime_tracking',"\n".$id.','.$listener.','.$status,FILE_APPEND);
     }
-    static function resetRuntimeTracking(){
-        file_put_contents(App::cfg('temp_path').DIRECTORY_SEPARATOR.'event_runtime_tracking',"");
+    static function resetRuntimeTracking($id){
+        $file = App::cfg('temp_path') . DIRECTORY_SEPARATOR . 'event_runtime_tracking';
+
+        $list = $list = explode("\n",file_get_contents($file));
+        $r = [];
+        foreach ($list as $v){
+            if($v!='' && strpos($v,$id.',')!==0){
+                $r[] = $v;
+            }
+        }
+
+        file_put_contents($file,implode("\n",$r));
     }
 
     /**
@@ -120,8 +138,8 @@ class Pool
      */
     static function scan(){
         $r = self::_driver()->scan();
-        if(!empty($r) && $r['pool_id']) {
-            Pool::pause($r['pool_id'], 20);
+        if(!empty($r) && $r['id']) {
+            Pool::pause($r['id'], 20);
         }
         return $r;
     }

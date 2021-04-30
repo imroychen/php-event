@@ -51,7 +51,9 @@ class File extends Driver
         $f = $this->_file($id);
         if(file_exists($f)) {
             $c = file_get_contents($f);
-            return unserialize($c);
+            $task = unserialize($c);
+            $task['id'] = $id;
+            return $task;
         }
         return false;
     }
@@ -65,10 +67,14 @@ class File extends Driver
     public function remove($id)
     {
         $idxFile = $this->_file('@index');
-        unlink($this->_file($id));
+
+        $f = $this->_file($id);
+        if(file_exists($f)) {
+            unlink($f);
+        }
 
         $content = file_get_contents($idxFile);
-        $content = preg_replace('/'.$id.',\d+?\|\s*/','',$content);
+        $content = preg_replace('/(^|\n)'.$id.'\,\d*?\|\s*/','$1',$content);
         file_put_contents($idxFile,$content);
         return true;
     }
@@ -87,19 +93,25 @@ class File extends Driver
      */
     public function create($data)
     {
-        $dataStr = serialize($data);
         $id = $data['sign'];
+
+        $data['id'] = $id;
+        $data['args'] = array_merge(['args'=>[]],$data);
+        $dataStr = serialize($data);
+
         $fIdx = $this->_file('@index');
+        $startTime = (isset($data['starting_time']) && $data['starting_time']>0)? ($data['starting_time']+0): 1;
 
         $f = $this->_file($id);
         $dir = dirname($f);
+
         if(!is_dir($dir)){
             mkdir($dir,0777,true);
             chmod($dir,0777);
         }
         file_put_contents($f,$dataStr);
         if(strpos(file_get_contents($fIdx),$id)===false) {
-            file_put_contents($fIdx, $dataStr, FILE_APPEND);
+            file_put_contents($fIdx, "\n$id,$startTime|" , FILE_APPEND);
         }
         return $id;
     }
@@ -131,7 +143,7 @@ class File extends Driver
     public function setStartingTime($id, $time)
     {
         $fileIdx = $this->_file('@index');
-        $content = preg_replace('/'.$id.',\d+?\|/',$id.','.$time.'|',file_get_contents($fileIdx));
+        $content = preg_replace('/(^|\n)'.$id.'\,\d*?\|/',$id.','.$time.'|',file_get_contents($fileIdx));
         return file_put_contents($fileIdx,$content);
     }
 
@@ -139,18 +151,24 @@ class File extends Driver
      * 扫描可运行的任务
      */
 
-    public function scan()
+    public function  scan()
     {
         $fileIdx = $this->_file('@index');
         $content = file_get_contents($fileIdx);
         $tmp = explode("\n",$content);
         $time = time();
+        //var_export($tmp);
         foreach ($tmp as $v ){
             if($v!='') {
                 list($v) = explode('|', $v);
-                list($id, $execTime) = explode(',', $v);
-                if ($execTime >= $time) {
-                    return $this->get($id);
+                list($id, $execTime) = explode(',', $v.',1');
+                //var_export($id);var_export($v);echo "\r\n";
+                if ($execTime < $time) {
+                    $r = $this->get($id);
+                    if(!$r && !file_exists($this->_file($id))){
+                        $this->remove($id);//无效任务
+                    }
+                    return $r;
                 }
             }
         }

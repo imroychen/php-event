@@ -13,8 +13,5 @@ use ir\e;
 class Base extends e\Subscriber
 {
 
-    protected function _onAfterXxx(){
-        //$args = $this->_event->getArgs();
-    }
 
 }
