@@ -113,15 +113,20 @@ class Pool
     static function resetRuntimeTracking($id){
         $file = App::cfg('temp_path') . DIRECTORY_SEPARATOR . 'event_runtime_tracking';
 
-        $list = $list = explode("\n",file_get_contents($file));
-        $r = [];
-        foreach ($list as $v){
-            if($v!='' && strpos($v,$id.',')!==0){
-                $r[] = $v;
+        if(file_exists($file)) {
+            $list = explode("\n", file_get_contents($file));
+            $r = [];
+            foreach ($list as $v) {
+                if ($v != '' && strpos($v, $id . ',') !== 0) {
+                    $r[] = $v;
+                }
             }
+            file_put_contents($file,implode("\n",$r));
+        }else{
+            file_put_contents($file,"");
         }
 
-        file_put_contents($file,implode("\n",$r));
+
     }
 
     /**
