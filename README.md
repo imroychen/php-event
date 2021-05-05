@@ -23,13 +23,17 @@
         ]
     }
 ```
+```SHELL
+composer 
+compoer update
+```
 
 3.在公共文件*`(单入口文件的项目建议在入口文件)`*中加入如下代码
 ```php
 ir\e\App::setCfg([
      'temp_path'=>'/tmp',//项目可写入的临时目录， 可选 默认系统的临时目录
      'event'=>'',//事件配置Class
-     'store_driver'=>'\\app\event\\Driver',//事件消息存储仓库
+     'store_driver'=>'\\MyNamespace\event\\Driver',//事件消息存储仓库
      'subscribers'=>'callback | string (files:subscriber绝对目录/*.php)'
 ]);
 ```
@@ -56,6 +60,18 @@ function(){
 
 ## 事件消息存储 
 1.mysql :sql 请参考<u>/src/drivers/RADME.md<u>
+```sql
+ CREATE TABLE IF NOT EXISTS `ir_event_pool` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) NOT NULL,
+  `starting_time` int(11) NOT NULL DEFAULT 0,
+  `sign` varchar(32) NOT NULL,
+  `dependency` int(11) NOT NULL DEFAULT 0,
+  `cfg` text NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `starting_time` (`starting_time`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+```
 
 2.Redis :请参考<u>/src/drivers/RADME.md</u>
 

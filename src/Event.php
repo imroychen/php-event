@@ -7,6 +7,8 @@
 
 namespace ir\e;
 
+use phpseclib3\Net\SFTP\Stream;
+
 class Event
 {
 
@@ -64,6 +66,23 @@ class Event
     }
 
     function getResult(){}
+
+    /**
+     * @param string $key
+     * @param mixed $default default null
+     * @param null|callable $filter default null
+     * @return mixed|null
+     */
+
+    function get($key,$default=null,$filter=null){
+        if(isset($this->_args[$key])){
+            if(is_callable($filter)){
+                return call_user_func($filter,$this->_args[$key]);
+            }
+            return $this->_args[$key];
+        }
+        return $default;
+    }
 
     /**
      * @param string $event

@@ -13,7 +13,7 @@ namespace ir\e\drivers;
  CREATE TABLE IF NOT EXISTS `ir_event_pool` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(100) NOT NULL,
-  `starting_time` int(11) NOT NULL,
+  `starting_time` int(11) NOT NULL DEFAULT 0,
   `sign` varchar(32) NOT NULL,
   `dependency` int(11) NOT NULL DEFAULT 0,
   `cfg` text NOT NULL,

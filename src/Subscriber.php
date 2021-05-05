@@ -51,6 +51,7 @@ class Subscriber
         $method = 'on'.$this->_eventName;
         if(method_exists($this,$method)){
             $r = $this->$method();
+            $r = is_null($r)? true: false; //防止事件监听器没有返回值
         }else {
             $r = false;
             //$r = $this->exec();
