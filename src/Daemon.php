@@ -52,6 +52,7 @@ class Daemon
             if(empty($this->_listeners)){
                 $this->_listeners = self::getListeners();
                 $this->_listeners['__']='';//防止没有数据每次都重新分析
+                Pool::resetRuntimeTracking(0);
             }
             $eventName = $task['name'];
             $nameLower = strtolower($eventName);
