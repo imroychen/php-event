@@ -59,7 +59,6 @@ class App
             if (!$poolId) {
                 $data = [
                     'name' => $event,
-                    'listener' => '',
                     'sign' => $eventSign,
                     'pool_run_time' => time() + $delay,
                     'rely' => '',
