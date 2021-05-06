@@ -54,22 +54,20 @@ class App
         if($checkRes) {
             $eventSign = Pool::createSign($event . '/' . var_export($args, true));
 
-            $poolId = Pool::isExist($eventSign);
+            $id = Pool::isExist($eventSign);
 
-            if (!$poolId) {
+            if (!$id) {
                 $data = [
                     'name' => $event,
                     'sign' => $eventSign,
-                    'pool_run_time' => time() + $delay,
-                    'rely' => '',
+                    'starting_time' => time() + $delay,
                     'dependency' => $dependency,
-                    //'cfg' => $args
+                    'cfg' => Pool::dataEncode($args)
                 ];
-                $data['cfg'] = Pool::dataEncode($args);
-                //$data['listener_sign'] = $sign;
-                $poolId = Pool::add($data);
+                //$data['cfg'] = Pool::dataEncode($args);
+                $id = Pool::add($data);
             }
-            return $poolId;
+            return $id;
         }else{
             return false;
         }
