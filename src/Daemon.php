@@ -42,6 +42,7 @@ class Daemon
         }
     }
 
+
     private function _isTimeout(){
         return $this->_enableTimeoutCtrl && $this->_timeout<time();
     }
@@ -61,7 +62,7 @@ class Daemon
             $progress = array_flip($listeners);//记录进度
             $event = new Event($task['name'],$task['args']);
 
-            echo 'ID:'.$task['id'].' / event:'.$task['name'].' / action:'.$task['listener'].' /args:' . $task['cfg'] . "\n";
+            echo 'ID:'.$task['id'].' / event:'.$task['name'].' /args:' . $task['cfg'] . "\n";
 
             foreach ($listeners as $cls=>$method) {
                 echo "/".$cls;
@@ -131,8 +132,8 @@ class Daemon
                     $obj = new ReflectionClass($cls);
                     $methods = $obj->getMethods();
                     foreach ($methods as $m) {
-                        if (strpos($m, '_on') === 0) {
-                            $eventName = strtolower(substr($m->name, 3));
+                        $eventName = strtolower(substr($m->name, 3));
+                        if (strpos($eventName, '_on') === 0) {
                             if (!isset($res[$eventName])) {
                                 $res[$eventName] = [];
                             }
@@ -145,5 +146,17 @@ class Daemon
         }
 
         return $res;
+    }
+
+    static public function ShowEvent(){
+        $listeners = self::getListeners();
+        $eventCls = App::cfg('event');
+        foreach ($listeners as $event=>$sub){
+            $cfg = $eventCls::$event();
+            echo "\r\n\r\n".$event."\t".empty($cfg)?'':json_encode($cfg);
+            foreach ($sub as $cls=>$func){
+                echo "\r\n\t".$cls .'>'.$func;
+            }
+        }
     }
 }

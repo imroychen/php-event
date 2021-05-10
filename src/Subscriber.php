@@ -46,6 +46,12 @@ class Subscriber
         }
     }
 
+    protected function _print($msg){
+        if($this->_debug){
+            print_r($msg);
+        }
+    }
+
     public function run(){
 
         $method = 'on'.$this->_eventName;
