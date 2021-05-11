@@ -73,7 +73,7 @@ class Daemon
                 }else {
                     $listenerObj = new $cls($task['id'],$event);
 
-                    if ($listenerObj->$method()) {
+                    if ($listenerObj->run()) {
                         unset($progress[$cls]);
                         echo " > ok";
                     } else {
