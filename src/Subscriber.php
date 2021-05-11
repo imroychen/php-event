@@ -69,6 +69,10 @@ class Subscriber
         return false;
     }
 
+    public static function __check__(){
+        return true;
+    }
+
     /**
      * 抽象方法的规范 结果只能返回ture|false
      * 如失败 稍后会自动重试 他的下游依赖链也会延时执行

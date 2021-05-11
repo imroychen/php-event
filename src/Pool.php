@@ -61,7 +61,7 @@ class Pool
 	static function add($data){
 		$id = self::_driver()->create($data);
 
-		self::setMark($data['pool_run_time']);
+		self::setMark($data['starting_time']);
 		return $id;//返回ID
 	}
 

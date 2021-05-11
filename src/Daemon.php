@@ -4,6 +4,7 @@
 namespace ir\e;
 
 use Exception;
+use ir\cli\Cli;
 use ReflectionClass;
 
 class Daemon
@@ -125,38 +126,79 @@ class Daemon
         }elseif(is_callable($subscribersCfg)){
             $subscribers = call_user_func($subscribersCfg);
         }
-
+        //var_export($subscribers);
         if(count($subscribers)>0) {
             foreach ($subscribers as $cls) {
-                try {
+                /**
+                 * @var Subscriber $cls
+                 */
+                $cls = preg_replace('/(\.class)*\.php$/i','',$cls);
+                //try {
+                    //$cls::__check__();
                     $obj = new ReflectionClass($cls);
                     $methods = $obj->getMethods();
+                    //var_export($methods);
                     foreach ($methods as $m) {
-                        $eventName = strtolower(substr($m->name, 3));
-                        if (strpos($eventName, '_on') === 0) {
+                        $nameLower = strtolower($m->name);
+                        if (strpos($nameLower, '_on') === 0) {
+                            $eventName = substr($nameLower, 3);
                             if (!isset($res[$eventName])) {
                                 $res[$eventName] = [];
                             }
                             $res[$eventName][$cls] = $m->name;
                         }
                     }
-                } catch (Exception $e) {
-                }
+                //} catch (Exception $e) {
+                //}
             }
         }
 
         return $res;
     }
 
-    static public function ShowEvent(){
+    static private function _showEvent(){
         $listeners = self::getListeners();
         $eventCls = App::cfg('event');
-        foreach ($listeners as $event=>$sub){
-            $cfg = $eventCls::$event();
-            echo "\r\n\r\n".$event."\t".empty($cfg)?'':json_encode($cfg);
-            foreach ($sub as $cls=>$func){
-                echo "\r\n\t".$cls .'>'.$func;
-            }
+
+        $funcList = [];
+        $_tmp = get_class_methods($eventCls);
+        foreach ($_tmp as $funcName){
+            $funcList[strtolower($funcName)] = $funcName;
         }
+
+        foreach ($listeners as $event=>$sub){
+
+            $cfg = [];
+            if(method_exists($eventCls,$event)) {
+                $cfg = $eventCls::$event();
+            }
+
+            echo "\n+------------------------------------------";
+            echo "\n <".(isset($funcList[$event])?$funcList[$event]:$event).">\t".(empty($cfg)?'--':json_encode($cfg))."\n";
+
+            foreach ($sub as $cls=>$func){
+                echo "\n\t".$cls;//.' > '.$func;
+            }
+            echo "\n";
+        }
+        echo "\n+------------------------------------------\n";
+        exit;
+    }
+
+    static public function start($cmd=''){
+        $cmd = trim($cmd);
+        if($cmd==='--ls'){
+            self::_showEvent();
+        }
+        //elseif ($cmd==='....'){}//更多参数
+        else {
+            //echo "5秒后启动监听器守护程序，结束请按 < Ctrl + C >\n";
+            //for ($i=5;$i>0;$i--){sleep(1);echo $i."\r"; }
+
+            //sleep(5);
+            $cls = __CLASS__;
+            new $cls();
+        }
+
     }
 }
