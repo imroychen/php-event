@@ -47,10 +47,16 @@ class Daemon
     private function _isTimeout(){
         return $this->_enableTimeoutCtrl && $this->_timeout<time();
     }
+    
+    private function _print($text,$ln=false){
+        echo $text.($ln?"\n":'');
+    }
 
     private function _runItem(){
         $task = Pool::scan();
         if($task){
+            $this->_print('EventMsg:// ID:'.$task['id'].' / event:'.$task['name'].' /args:' . $task['cfg'] ,true);
+
             if(empty($this->_listeners)){
                 $this->_listeners = self::getListeners();
                 $this->_listeners['__']='';//防止没有数据每次都重新分析
@@ -58,26 +64,25 @@ class Daemon
             $eventName = $task['name'];
             $nameLower = strtolower($eventName);
             $listeners = (isset($this->_listeners[$nameLower])&& is_array($this->_listeners[$nameLower]))? $this->_listeners[$nameLower]: [];
-            echo 'Listeners:'.(empty($listeners)?'none':implode(',',array_keys($listeners)));
+            $this->_print("\tListeners:".(empty($listeners)?'none':implode(',',array_keys($listeners))) ,true);
+
             $tracking = Pool::getRuntimeTracking($task['id']);//如果上次意外退出，接着上次继续运行
             $progress = array_flip($listeners);//记录进度
             $event = new Event($task['name'],$task['args']);
 
-            echo 'ID:'.$task['id'].' / event:'.$task['name'].' /args:' . $task['cfg'] . "\n";
-
             foreach ($listeners as $cls=>$method) {
-                echo "/".$cls;
+                $this->_print( "/".$cls,false);
                 if(isset($tracking[$cls]) && $tracking[$cls]) {
                     unset($progress[$cls]);
-                    echo "> skip";
+                    $this->_print( "> skip",false);
                 }else {
                     $listenerObj = new $cls($task['id'],$event);
 
                     if ($listenerObj->run()) {
                         unset($progress[$cls]);
-                        echo " > ok";
+                        $this->_print( "> ok",false);
                     } else {
-                        echo "\t $cls > false";
+                        $this->_print( "\t $cls > false",false);
                     }
 
                 }
