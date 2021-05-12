@@ -52,21 +52,19 @@ class Subscriber
         }
     }
 
+    /**
+     * @return bool
+     */
+
     public function run(){
 
-        $method = 'on'.$this->_eventName;
+        $method = '_on'.$this->_eventName;
+        $r = false;
         if(method_exists($this,$method)){
             $r = $this->$method();
             $r = is_null($r)? true: false; //防止事件监听器没有返回值
-        }else {
-            $r = false;
-            //$r = $this->exec();
         }
-        if($r) {
-            Pool::remove($this->_id);
-            return true;
-        }
-        return false;
+        return $r;
     }
 
     public static function __check__(){
