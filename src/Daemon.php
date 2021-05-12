@@ -82,7 +82,7 @@ class Daemon
                         unset($progress[$cls]);
                         $this->_print( "> ok",false);
                     } else {
-                        $this->_print( "\t $cls > false",false);
+                        $this->_print( "> false",false);
                     }
 
                 }

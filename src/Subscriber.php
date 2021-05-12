@@ -62,7 +62,7 @@ class Subscriber
         $r = false;
         if(method_exists($this,$method)){
             $r = $this->$method();
-            $r = is_null($r)? true: false; //防止事件监听器没有返回值
+            $r = is_null($r)? true: $r; //防止事件监听器没有返回值
         }
         return $r;
     }
