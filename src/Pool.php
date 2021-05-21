@@ -26,6 +26,7 @@ class Pool
     }
 
     /**
+     * 读取事件消息
      * @param $id
      * @return mixed false|['字段名'=>'字段值', ...]
      */
@@ -35,7 +36,7 @@ class Pool
 	}
 
 	/**
-	 * 移除事件监听器动作
+	 * 移除事件消息
 	 * @param $id
 	 * @return bool
 	 */
@@ -46,7 +47,7 @@ class Pool
 	}
 
 	/**
-	 * 插入事件监听器动作到池中
+	 * 插入事件消息到池中
 	 * @param array $data [
 	 *		'event_name'=>'',
 	 * 		'event_sign'=>'',
@@ -66,7 +67,7 @@ class Pool
 	}
 
 	/**
-	 * 检查事件监听器动作否存在
+	 * 检查事件事件消息否存在
 	 * @param $sign
 	 * @return int 0|id
 	 */
@@ -76,16 +77,16 @@ class Pool
 	}
 
 	/**
-	 * 暂停事件监听器动作
+	 * 暂停事件事件消息
 	 * @param int $poolId
 	 * @param int $s 暂停多少秒
 	 * @return bool
 	 */
 
-	static function pause($poolId,$s){
+	static function pause($id,$s){
         $time = time()+$s;
 		self::setMark($time);
-		return self::_driver()->setStartingTime($poolId,$time);
+		return self::_driver()->setStartingTime($id,$time);
 	}
 
     /**

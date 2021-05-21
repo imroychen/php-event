@@ -4,7 +4,8 @@
 namespace ir\e\drivers;
 
 /**
- * Redis 驱动
+ * File 驱动
+ * File:path=/your/path
  * @package ir\e\drivers
  * @example new File('path=...')
  */
@@ -173,5 +174,10 @@ class File extends Driver
             }
         }
         return false;
+    }
+    
+    public function __destruct()
+    {
+        // TODO: Implement __destruct() method.
     }
 }

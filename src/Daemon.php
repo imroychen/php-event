@@ -22,7 +22,7 @@ class Daemon
         while ($status){
             $status = self::_runItem();
             if(!$status){
-                echo "无任务\r\n";
+                echo '无任务 ['.date('H:i:s')."] \r\n";
                 Pool::setMark(time()+60,true);//如果没有新的事件发生，将会在60秒后重试
                 while (1){
                     $mark = Pool::getMark();//避免数据库过载

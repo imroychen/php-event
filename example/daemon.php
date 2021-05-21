@@ -2,14 +2,15 @@
 
 use ir\e;
 
+
 if(substr(PHP_SAPI_NAME(),0,3) !== 'cli'){
     exit("请在CLI下运行 / The program runs only in CLI mode!");
 }
-
-
 chdir(__DIR__);
 require (dirname(__DIR__)) . '/start.php';
 
+//-------------------------
+//系统配置
 e\App::setCfg([
     'subscribers' => 'files:' . __DIR__ . '/subscriber/*.php',
     'event' => '\\MyNamespace\\Event',
@@ -19,4 +20,4 @@ e\App::setCfg([
 ]);
 
 //启动守护进程
-new e\Daemon();
+e\Daemon::start();

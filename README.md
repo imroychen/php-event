@@ -1,8 +1,8 @@
 ## 事件2.0
 
 
-## 独立运作
-## 整合到项目
+## 1.独立运作
+## 2.整合到项目
     好处：可以使用自己项目的中的上下文代码及任何功能来写动作和监听器(如：您项目中使用框架功能，数据库操作方法).
     
     使用composer整合
@@ -28,18 +28,19 @@ composer
 compoer update
 ```
 
-3.在公共文件*`(单入口文件的项目建议在入口文件)`*中加入如下代码
+3. 配置设置，在公共文件*`(单入口文件的项目建议在入口文件)`*中加入如下代码
 ```php
 ir\e\App::setCfg([
-     'temp_path'=>'/tmp',//项目可写入的临时目录， 可选 默认系统的临时目录
+     
      'event'=>'',//事件配置Class
-     'store_driver'=>'\\MyNamespace\event\\Driver',//事件消息存储仓库
-     'subscribers'=>'callback | string (files:subscriber绝对目录/*.php)'
+     'store_driver'=>'\\MyNamespace\event\\Driver',//事件消息存储仓库驱动
+     'subscribers'=>'callback | string (files:subscriber绝对目录/*.php)',
+     'temp_path'=>'/tmp',//项目可写入的临时目录， 可选 默认系统的临时目录
 ]);
 ```
 
 **store_driver:** 
-    //该包中内置了 Mysql，Redis，Tp5Db(thinkphp5 项目中的DB), Tp3Db等驱动。
+    //该包中内置了 Db（Sql DB），Redis，Tp5Db(thinkphp5 项目中的DB操作), Tp3Db等驱动。
     内置驱动使用方法：'store_driver'=>'@Tp5Db:event_store', 表示使用内置的驱动（Tp5Db）参数(表)为event_store
     
 ##### subscribers: 
@@ -59,7 +60,7 @@ function(){
 ```
 
 ## 事件消息存储 
-1.mysql :sql 请参考<u>/src/drivers/RADME.md<u>
+1.DB :sql 请参考<u>/src/drivers/RADME.md<u>
 ```sql
  CREATE TABLE IF NOT EXISTS `ir_event_pool` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
