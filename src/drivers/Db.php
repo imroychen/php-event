@@ -7,6 +7,11 @@ namespace ir\e\drivers;
  *
  * 该驱动不能直接使用，需要继承后自己去实现 _query和 _exec两个方法
  * 使用方法
+ * 1.推荐 驱动Class名?table=tablename
+ * 如 \MyNameSpace\Mysql?table=ir_event_pool
+ * 2.驱动Class名?tablename
+ *
+ *
  * @example
   ```php
     namespace MyNameSpace;
@@ -52,32 +57,46 @@ create index starting_time  on ir_event_pool (starting_time);
 
 abstract class Db extends Driver
 {
-    protected $_table='event_pool';
+    protected $_table='ir_event_pool';
 
     /**
-     * @param $sql
+     * @param string $sql
      * @return array    [ ['field'=>'value', 'more fields...'], 'more records....']
      */
 
     abstract protected function _query($sql);
 
     /**
-     * @param $sql
+     * @param string $sql
+     * @param string $sqlType 'delete/insert/update'
      * @return bool
      */
 
-    abstract protected function _exec($sql);
+    abstract protected function _exec($sql,$sqlType);
 
     /**
      * @param array $args
      * @param string $rawArgs
      */
 
-    protected function _init($args,$rawArgs)
+    protected function _init($args, $rawArgs)
     {
-        if($args != '') {
-            $this->_table = $args;
+        if(isset($args['table'])) {
+            $this->_table = $args['table'];
+        }elseif(!empty($rawArgs)){
+            $this->_table = preg_replace('/\W+/','',$rawArgs);
         }
+    }
+
+    protected function _itemToArray($result){
+        if(!empty($result)){
+            foreach ($result as &$v) {
+                if (is_object($v)) {
+                    $v = get_object_vars($v);
+                }
+            }unset($v);
+        }
+        return $result;
     }
 
     private function _sql($sql){
@@ -112,7 +131,7 @@ abstract class Db extends Driver
     public function remove($id)
     {
         $id = var_export(strval($id),true);
-        $r = $this->_query($this->_sql('delete from {{table}} where `id`='.$id));
+        $r = $this->_exec($this->_sql('delete from {{table}} where `id`='.$id),'delete');
         return $r!==false;
     }
 
@@ -139,7 +158,7 @@ abstract class Db extends Driver
                 $fields[] = '`' . $f . '`';
                 $values[] = var_export($v, true);
             }
-            $res = $this->_exec($this->_sql('insert into {{table}} ' . $fields . ' values ' . $values));
+            $res = $this->_exec($this->_sql('insert into {{table}} ' . $fields . ' values ' . $values),'insert');
             return $res ? $id:false;
         }
         return true;
@@ -168,7 +187,7 @@ abstract class Db extends Driver
     public function setStartingTime($id, $time)
     {
         $id = var_export(strval($id),true);
-        return $this->_exec($this->_sql('update {{table}} set `starting_time`='.$time.' where `id`='.$id ) );
+        return $this->_exec($this->_sql('update {{table}} set `starting_time`='.$time.' where `id`='.$id ), 'update' );
     }
 
     /**

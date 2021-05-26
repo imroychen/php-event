@@ -7,7 +7,7 @@ class App
 {
     /**
      * @var array [
-     *      temp_path=>'临时目录 需可写'
+     *      temp_path=>'临时目录 需可写'  默认系统临时目录
      *      store_driver=>'存储器的驱动Class ./drivers/Driver.php'
      *      subscribers=> callback | fiels:绝对路径/*
      *      event=>'事件配置文件'
@@ -31,6 +31,27 @@ class App
 
         if(!isset(self::$_cfg['temp_path'])){
             self::$_cfg['temp_path'] = sys_get_temp_dir();
+        }
+
+        if(!isset(self::$_cfg['store_driver'])){//智能选择驱动
+            if(defined('THINK_PATH') && defined(THINK_VERSION )){
+                //thinkphp <5.1
+                $info = explode('.',THINK_VERSION.'.0.0.0');
+                $info = array_map('intval',$info);
+                $version = $info[0]*1000*1000 + $info[1]*1000 + $info[2];
+                //000 000 000
+                if($version<5000000){
+                    self::$_cfg['store_driver']=__NAMESPACE__ . '\\drivers\\DbForTp3';
+                }else{
+                    self::$_cfg['store_driver']=__NAMESPACE__ . '\\drivers\\DbForTp';
+                }
+            }elseif (class_exists('\\think\\Db')){ //thinkphp >5.1
+                self::$_cfg['store_driver']=__NAMESPACE__ . '\\drivers\\DbForTp';
+            }elseif (class_exists('\\Illuminate\\Support\\Facades\\DB')){ //laravel >5.1
+                self::$_cfg['store_driver']=__NAMESPACE__ . '\\drivers\\DbForLaravel';
+            }else{
+
+            }
         }
     }
 

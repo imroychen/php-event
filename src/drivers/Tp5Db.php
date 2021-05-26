@@ -27,7 +27,11 @@ class Tp5Db extends Driver
 
     protected function _init($args, $rawArgs)
     {
-        $this->_table = $rawArgs;
+        if(isset($args['table'])) {
+            $this->_table = $args['table'];
+        }else{
+            $this->_table = preg_replace('/\W+/','',$rawArgs);
+        }
     }
 
     /**

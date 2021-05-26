@@ -77,14 +77,13 @@ class Daemon
                     $this->_print( "> skip",false);
                 }else {
                     $listenerObj = new $cls($task['id'],$event);
-
                     if ($listenerObj->run()) {
+                        Pool::setRuntimeTracking($task['id'],$cls,1);//如果上次意外退出，接着上次继续运行
                         unset($progress[$cls]);
                         $this->_print( "> ok",false);
                     } else {
                         $this->_print( "> false",false);
                     }
-
                 }
             }
             if(empty($progress)){
@@ -161,7 +160,7 @@ class Daemon
         return $res;
     }
 
-    static private function _showEvent(){
+    static private function _showEvent($p=''){
         $listeners = self::getListeners();
         $eventCls = App::cfg('event');
 
@@ -171,22 +170,28 @@ class Daemon
             $funcList[strtolower($funcName)] = $funcName;
         }
 
-        foreach ($listeners as $event=>$sub){
-
-            $cfg = [];
-            if(method_exists($eventCls,$event)) {
-                $cfg = $eventCls::$event();
-            }
-
-            echo "\n+------------------------------------------";
-            echo "\n <".(isset($funcList[$event])?$funcList[$event]:$event).">\t".(empty($cfg)?'--':json_encode($cfg))."\n";
-
-            foreach ($sub as $cls=>$func){
-                echo "\n\t".$cls;//.' > '.$func;
-            }
-            echo "\n";
+        if(!empty($p)){
+            $p = trim(strtolower($p));
+            $listeners = isset($listeners[$p])?[$listeners[$p]]:[];
         }
-        echo "\n+------------------------------------------\n";
+        if(!empty($listeners)) {
+            foreach ($listeners as $event => $sub) {
+
+                $cfg = [];
+                if (method_exists($eventCls, $event)) {
+                    $cfg = $eventCls::$event();
+                }
+
+                echo "\n+------------------------------------------";
+                echo "\n <" . (isset($funcList[$event]) ? $funcList[$event] : $event) . ">\t" . (empty($cfg) ? '--' : json_encode($cfg)) . "\n";
+
+                foreach ($sub as $cls => $func) {
+                    echo "\n\t" . $cls;//.' > '.$func;
+                }
+                echo "\n";
+            }
+            echo "\n+------------------------------------------\n";
+        }
         exit;
     }
 
@@ -194,6 +199,9 @@ class Daemon
         $cmd = trim($cmd);
         if($cmd==='--ls'){
             self::_showEvent();
+        }elseif(strpos($cmd,'--event:')===0){
+            list(,$event) = explode(':',$cmd);
+            self::_showEvent($event);
         }
         //elseif ($cmd==='....'){}//更多参数
         else {

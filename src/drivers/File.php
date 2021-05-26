@@ -5,7 +5,7 @@ namespace ir\e\drivers;
 
 /**
  * File 驱动
- * File:path=/your/path
+ * File?path=/your/path
  * @package ir\e\drivers
  * @example new File('path=...')
  */

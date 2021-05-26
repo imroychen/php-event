@@ -4,14 +4,16 @@ abstract class Driver
 {
     /**
      * Driver constructor.
-     * @param string $args
+     * @param $rawArgs
      */
     function __construct($rawArgs){
-        $_argsArr = explode(';',$rawArgs);
+        $_argsArr = explode('&',$rawArgs);
         $args = [];
-        foreach ($_argsArr as $item){
-            $tmp = explode('=',$item.'=');
-            $args[trim($tmp[0])] = trim($tmp[1]);
+        if(count($_argsArr)>0) {
+            foreach ($_argsArr as $item) {
+                $tmp = explode('=', $item . '=');
+                $args[trim($tmp[0])] = urldecode(trim($tmp[1]));
+            }
         }
         return $this->_init($args,$rawArgs);
     }

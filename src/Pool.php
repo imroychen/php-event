@@ -15,10 +15,10 @@ class Pool
     static private function _driver(){
 
         if(empty(self::$_driver)){
-            $driver = explode(':', App::cfg('store_driver'));
+            $driver = explode('?', App::cfg('store_driver'));
             $cls = $driver[0];
             unset($driver[0]);
-            $args = count($driver) > 0 ? implode(':', $driver) : '';
+            $args = count($driver) > 0 ? implode('?', $driver) : '';
             self::$_driver = new $cls($args);
             self::resetRuntimeTracking(0);
         }
@@ -131,14 +131,6 @@ class Pool
     }
 
     /**
-     * 临时目录 确保 WEB 和 CLI 都能操作该文件
-     * @return string
-     */
-    static private function _getMarkPath(){
-        return App::cfg('temp_path') .DIRECTORY_SEPARATOR. 'event-queue-mark';
-    }
-
-    /**
      * 扫描可运行的任务
      * @return mixed
      */
@@ -150,6 +142,13 @@ class Pool
         return $r;
     }
 
+    /**
+     * 临时目录 确保 WEB 和 CLI 都能操作该文件
+     * @return string
+     */
+    static private function _getMarkPath(){
+        return App::cfg('temp_path') .DIRECTORY_SEPARATOR. 'event-queue-mark';
+    }
 
 	static function setMark($time,$compulsory=false){
 		$f = self::_getMarkPath();
