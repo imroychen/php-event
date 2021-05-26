@@ -48,20 +48,14 @@ class Pool
 
 	/**
 	 * 插入事件消息到池中
-	 * @param array $data [
-	 *		'event_name'=>'',
-	 * 		'event_sign'=>'',
-	 *
-	 *		'event_listener'=>'',	 *
-	 *		'event_dependency'=>'',
-	 *		'event_cfg'=>[]
+	 * @param array $data [...
 	 *	];
-	 * @return int
+	 * @return string
 	 */
 
 	static function add($data){
-		$id = self::_driver()->create($data);
-
+        $id = $data['id'];
+		self::_driver()->create($data);
 		self::setMark($data['starting_time']);
 		return $id;//返回ID
 	}
@@ -69,7 +63,7 @@ class Pool
 	/**
 	 * 检查事件事件消息否存在
 	 * @param $sign
-	 * @return int 0|id
+	 * @return string false|id
 	 */
 
 	static function isExist($sign){
@@ -78,7 +72,7 @@ class Pool
 
 	/**
 	 * 暂停事件事件消息
-	 * @param int $poolId
+	 * @param string $poolId
 	 * @param int $s 暂停多少秒
 	 * @return bool
 	 */

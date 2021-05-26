@@ -139,7 +139,6 @@ abstract class Db extends Driver
      * 插入事件消息到池中
      * @param array $data [
      *        'name'=>'',
-     *        'sign'=>'',
      *
      *        //'listener'=>'',     *
      *        'dependency'=>'',

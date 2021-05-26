@@ -79,8 +79,8 @@ class App
 
             if (!$id) {
                 $data = [
+                    'id'=>$eventSign,
                     'name' => $event,
-                    'sign' => $eventSign,
                     'starting_time' => time() + $delay,
                     'dependency' => $dependency,
                     'cfg' => Pool::dataEncode($args)
