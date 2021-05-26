@@ -1,18 +1,18 @@
 #内置驱动
-1. mysql：该驱动 不可直接使用 需要你自己创建一个class 去实现 method _query 和 _exec两个方法
+1. Db：该驱动 不可直接使用 需要你自己创建一个class 去实现 method _query 和 _exec两个方法
 
-1. Redis _<u>Redis:host=localhost;port=3307;dataset=key</u>_
+1. Redis _<u>Redis?host=localhost&port=3307&dataset=key</u>_
 
-1. File _<u>File:path=绝对路径</u>_
+1. File _<u>File?path=绝对路径</u>_
 
-1. 如果使用了框架thinkphp 3.* 且准备使用数据库作为事件消息存储 你可以直接使用Tp3Db驱动 用法'<u>@Tp3Db:表名</u>'
+1. 如果使用了框架thinkphp  且准备使用数据库作为事件消息存储 你可以直接使用DbForLaravel驱动 用法'<u>@Tp3Db:表名</u>'
 
-1. 同上 thinkphp 5.* 或者 6.* 使用_<u>Tp5Db</u>_ 或者 _<u>Tp6Db</u>_
+1. 同上 Laravel框架 也可直接使用_<u>DbForLaravel</u>_ 内置驱动
 
 1. 更多内置驱动参考代码
  
 # 自定义驱动
-只要自己定义个Class 代码如下
+只要自己定义个Class 代码如下，代码可以放在你的项目的任何地方。只要符合你的项目的自动加载规范
 ```php
 class MyDriver extends Driver{
         /**
@@ -87,4 +87,30 @@ class MyDriver extends Driver{
 }
 ```
 
-## mysql 数据表
+## DB驱动数据表
+```sql
+-- Mysql  ir_event_pool换成你的表名
+ CREATE TABLE IF NOT EXISTS `ir_event_pool` (
+  `id` varchar(32) NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `starting_time` int(11) NOT NULL DEFAULT 0,
+  `dependency` int(11) NOT NULL DEFAULT 0,
+  `cfg` text NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `starting_time` (`starting_time`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+```
+```sql
+-- Qqlite
+create table ir_event_pool
+(
+    id            varchar(32)  not null primary key,
+    name          varchar(100) not null,
+    starting_time int(11) default 0 not null,
+    dependency    int(11) default 0 not null,
+    cfg           text         not null
+);
+create index starting_time  on ir_event_pool (starting_time);
+
+//也可直接复制 ../../example/data/data_store.sqlite.db; 文件
+```

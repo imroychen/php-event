@@ -1,7 +1,7 @@
 <?php
 
 
-namespace MyNamespace\subscriber;
+namespace MyNamespace\subscribers;
 
 
 use ir\e;

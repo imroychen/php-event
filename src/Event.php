@@ -67,6 +67,10 @@ class Event
 
     function getResult(){}
 
+    function getActions(){
+
+    }
+
     /**
      * @param string $key
      * @param mixed $default default null

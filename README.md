@@ -1,12 +1,6 @@
 ## 事件2.0
-
-
-## 1.独立运作
-## 2.整合到项目
-    好处：可以使用自己项目的中的上下文代码及任何功能来写动作和监听器(如：您项目中使用框架功能，数据库操作方法).
-    
-    使用composer整合
-        
+## 安装和使用
+### 1. 安装
 1. 传统装载：在你的公共代码中加入 require_once('php-event PATH/start.php');
 2. compser装载
 ```json
@@ -24,14 +18,13 @@
     }
 ```
 ```SHELL
-composer 
 compoer update
 ```
 
-3. 配置设置，在公共文件*`(单入口文件的项目建议在入口文件)`*中加入如下代码
+### 2. 配置设置
+    在公共文件*`(单入口文件的项目建议在入口文件)`*中加入如下代码
 ```php
 ir\e\App::setCfg([
-     
      'event'=>'',//事件配置Class
      'store_driver'=>'\\MyNamespace\event\\Driver',//事件消息存储仓库驱动
      'subscribers'=>'callback | string (files:subscriber绝对目录/*.php)',
@@ -40,8 +33,9 @@ ir\e\App::setCfg([
 ```
 
 **store_driver:** 
-    //该包中内置了 Db（Sql DB），Redis，Tp5Db(thinkphp5 项目中的DB操作), Tp3Db等驱动。
-    内置驱动使用方法：'store_driver'=>'@Tp5Db:event_store', 表示使用内置的驱动（Tp5Db）参数(表)为event_store
+    //该应用中内置了 Db （Sql DB），Sqlite，Redis，DbForLaravel ,DbForTp(thinkphp 项目中的DB操作), 等驱动。<br>
+    内置驱动使用方法：'store_driver'=>'@DbForLaravel:event_store', 表示使用内置的驱动（DbForLaravel）参数(表)为event_store
+    <br> 更多内置驱动请参考<u>/src/drivers/RADME.md</u>
     
 ##### subscribers: 
 callback | string 如:files:subscriber目录/*.php(会自动从这些文件的代码中分析出来Class全名)
@@ -59,25 +53,7 @@ function(){
 'auto:'.__DIR__.'/subscriber/*.php';
 ```
 
-## 事件消息存储 
-1.DB :sql 请参考<u>/src/drivers/RADME.md<u>
-```sql
- CREATE TABLE IF NOT EXISTS `ir_event_pool` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(100) NOT NULL,
-  `starting_time` int(11) NOT NULL DEFAULT 0,
-  `sign` varchar(32) NOT NULL,
-  `dependency` int(11) NOT NULL DEFAULT 0,
-  `cfg` text NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `starting_time` (`starting_time`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-```
-
-2.Redis :请参考<u>/src/drivers/RADME.md</u>
-
-
-## 使用方法
+### 3触发事件
 
 ### 快捷使用方法
 ```php
@@ -106,4 +82,24 @@ $fire->getLastEventId();//获取最后一次事件的ID
 这种用法自动形成一条事件依赖链，用于保证事件监听者的执行顺序
 complete 依赖 afterRequest    complete会自动等待afterRequest被所有监听者确认之后 才会真正广播出去。
 afterRequest 依赖 beforeRequest    afterRequest会自动等待 beforeRequest 被所有监听者确认之后 才会真正广播出去。
+
+### 事件的使用模式
+
+
+1. 事件订阅模式
+1. 事件绑定模式
+1. 代码注入模式
+
+#### 事件订阅模式
+请参考 example/subscribers/README.md;
+
+#### 事件绑定模式
+查看事件配置的 actions=>['']
+请参考 _example/event.php_; 和 _example/actions/README.md_;
+
+### 代码注入模式
+查看事件配置的 exec=>['']
+请参考 _example/event.php_; 和 _example/scripts/README.md_;
+
+
 

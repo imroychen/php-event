@@ -70,6 +70,21 @@ class Daemon
             $progress = array_flip($listeners);//记录进度
             $event = new Event($task['name'],$task['args']);
 
+            //执行事件绑定的动作
+            $actions = $event->getActions();
+            if(!empty($actions)) {
+                foreach ($actions as $action) {
+                    if(isset($tracking[$action]) && $tracking[$action]) {
+                        $r = (new $action($event))->exec();
+                        if ($r) {
+                            Pool::setRuntimeTracking($task['id'],$action,1);//如果上次意外退出，接着上次继续运行
+                        }
+                    }
+                }
+            }
+
+            //发送消息到订阅者的监听器
+
             foreach ($listeners as $cls=>$method) {
                 $this->_print( "/".$cls,false);
                 if(isset($tracking[$cls]) && $tracking[$cls]) {
@@ -86,6 +101,7 @@ class Daemon
                     }
                 }
             }
+
             if(empty($progress)){
                 Pool::remove($task['id']);
             }
@@ -183,8 +199,14 @@ class Daemon
                 }
 
                 echo "\n+------------------------------------------";
+                
                 echo "\n <" . (isset($funcList[$event]) ? $funcList[$event] : $event) . ">\t" . (empty($cfg) ? '--' : json_encode($cfg)) . "\n";
 
+                if(!empty($cfg['actions'])) {
+                    echo "actions:\n";
+                    $str = implode('\t\n', $cfg['actions']);
+                    echo $str . "\n\n";
+                }
                 foreach ($sub as $cls => $func) {
                     echo "\n\t" . $cls;//.' > '.$func;
                 }

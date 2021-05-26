@@ -1,5 +1,5 @@
 <?php
-namespace MyNamespace\subscriber;
+namespace MyNamespace\subscribers;
 
 class Example extends Base
 {

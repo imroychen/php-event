@@ -73,6 +73,16 @@ class App
     static public function fire($event,$args,$delay=3,$dependency=0){
         $checkRes = true;//$this->_checkArgs($args);
         if($checkRes) {
+            //在不改变原代码结构的情况下，注入自己的代码
+            $cls = self::cfg('event');
+            $eventInfo  = method_exists($cls,$event)?$cls::$event():[];
+            if($eventInfo['exec']){
+                foreach ($eventInfo['exec'] as $cls){
+                    new $cls();
+                }
+            }
+
+
             $eventSign = Pool::createSign($event . '/' . var_export($args, true));
 
             $id = Pool::isExist($eventSign);
