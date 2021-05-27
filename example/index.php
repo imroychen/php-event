@@ -3,7 +3,7 @@ require (dirname(__DIR__)).'/start.php';
 
 ir\e\App::setCfg([
     'subscribers'=>'files:'.__DIR__.'/subscriber/*.php',
-    'event'=>'\\MyNamespace\\Event',    //事件配置Class
+    'event'=>'\\MyNamespace\\Event',//事件配置Class
     //'store_driver'=>'\\MyNamespace\\Driver',    //事件消息存储仓库驱动
     //'store_driver'=>'@Sqlite?path='.__DIR__.'/file_store',    //事件消息存储仓库驱动
     //'store_driver'=>'@File?path='.__DIR__.'/file_store',    //事件消息存储仓库驱动

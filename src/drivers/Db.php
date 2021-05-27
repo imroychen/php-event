@@ -157,7 +157,9 @@ abstract class Db extends Driver
                 $fields[] = '`' . $f . '`';
                 $values[] = var_export($v, true);
             }
-            $res = $this->_exec($this->_sql('insert into {{table}} ' . $fields . ' values ' . $values),'insert');
+            $fieldsStr = implode(',',$fields);
+            $valuesStr = implode(',',$values);
+            $res = $this->_exec($this->_sql('insert into {{table}} (' . $fieldsStr . ') values (' . $valuesStr.')'),'insert');
             return $res ? $id:false;
         }
         return true;
