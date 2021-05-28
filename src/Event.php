@@ -47,8 +47,16 @@ class Event
     {
         $this->_eventName = $eventName;//strtolower($eventName);
         $eventCfgCls = App::cfg('event');
-        if(empty($eventCfgCls) && method_exists($this->_eventName,$eventCfgCls)) {
+
+        if(!empty($eventCfgCls) && method_exists($eventCfgCls,$this->_eventName)) {
             $this->_eventConfig = call_user_func([$eventCfgCls, $this->_eventName]);
+            if(!empty($this->_eventConfig['actions']) && defined($eventCfgCls.'::ACTION_NS') && $eventCfgCls::ACTION_NS) {
+                foreach ($this->_eventConfig['actions'] as $key=>$cls) {
+                    if (strstr($cls,'\\')===false) {
+                        $this->_eventConfig['actions'][$key] = $eventCfgCls::ACTION_NS .'\\'. $cls;
+                    }
+                }
+            }
         }
         $this->_args = $args;
     }
@@ -68,7 +76,11 @@ class Event
     function getResult(){}
 
     function getActions(){
-
+        if(isset($this->_eventConfig['actions'])) {
+            return $this->_eventConfig['actions'];
+        }else{
+            return [];
+        }
     }
 
     /**

@@ -38,7 +38,7 @@ namespace ir\e\drivers;
   `name` varchar(100) NOT NULL,
   `starting_time` int(11) NOT NULL DEFAULT 0,
   `dependency` int(11) NOT NULL DEFAULT 0,
-  `cfg` text NOT NULL,
+  `args` text NOT NULL,
   PRIMARY KEY (`id`),
   KEY `starting_time` (`starting_time`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
@@ -50,7 +50,7 @@ create table ir_event_pool
     name          varchar(100) not null,
     starting_time int(11) default 0 not null,
     dependency    int(11) default 0 not null,
-    cfg           text         not null
+    args           text         not null
 );
 create index starting_time  on ir_event_pool (starting_time);
 */
@@ -143,7 +143,7 @@ abstract class Db extends Driver
      *        //'listener'=>'',     *
      *        'dependency'=>'',
      *         'starting_time'
-     *        'cfg'=>[]
+     *        'args'=>[]
      *    ];
      * @return string $id
      */

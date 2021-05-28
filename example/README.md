@@ -1,10 +1,16 @@
 # 使用实例
 # 目录
-.
-+- index.php    测试触发事件的代码 
-+- daemon.php   守护进程（广播事件消息用的 请使用CLI启动）
-+- Event.php    事件配置
-+- Driver.php   消除暂存 驱动 比如：Redis Mysql等
-+- subscriber   事件监听者目录 
-  +- Example.php  事件监听者及动作
+```
+/
++--- database       测试项目的存储仓库（数据库）
++--- index.php      测试触发事件的代码 
++--- daemon.php     守护进程（广播事件消息用的 请使用CLI启动） php daemon.php
++--- event/ 
+    +--- Event.php      事件配置
+    +--- Driver.php     消除暂存驱动  【可选】
+    +--- Example.php    事件监听者及动作
+    +--- subscribers/   事件订阅者目录 （用于存放订阅者模式相关的代码） 【可选】
+    +--- actions/       事件绑定的动作目录 （用于存放 事件模式下绑定的动作代码） 【可选】
+    +--- scripts/       注入代码 （该目录用于存放 注入到 事件触发处的同步运行的代码） 【可选】
+```
   

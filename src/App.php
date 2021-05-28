@@ -76,32 +76,24 @@ class App
             //在不改变原代码结构的情况下，注入自己的代码
             $cls = self::cfg('event');
             $eventInfo  = method_exists($cls,$event)?$cls::$event():[];
-            if($eventInfo['exec']){
+            if(isset($eventInfo['exec']) && count($eventInfo['exec'])>0){
                 foreach ($eventInfo['exec'] as $cls){
                     new $cls();
                 }
             }
 
-
-            $eventSign = Pool::createSign($event . '/' . var_export($args, true));
-
-            $id = Pool::isExist($eventSign);
-
-            if (!$id) {
+            if ($event) {
                 $data = [
-                    'id'=>$eventSign,
                     'name' => $event,
                     'starting_time' => time() + $delay,
                     'dependency' => $dependency,
-                    'cfg' => Pool::dataEncode($args)
+                    'args' => $args
                 ];
-                //$data['cfg'] = Pool::dataEncode($args);
-                $id = Pool::add($data);
+                //$data['args'] = Pool::dataEncode($args);
+                return Pool::add($data);
             }
-            return $id;
-        }else{
-            return false;
         }
+        return false;
     }
 
 

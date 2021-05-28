@@ -1,7 +1,7 @@
 <?php
 
 
-namespace MyNamespace\subscribers;
+namespace MyNamespace\event\subscribers;
 
 
 use ir\e;

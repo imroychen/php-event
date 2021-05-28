@@ -1,5 +1,5 @@
 <?php
-namespace MyNamespace;
+namespace MyNamespace\event;
 
 use ir\e\drivers;
 

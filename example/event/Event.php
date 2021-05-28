@@ -1,7 +1,7 @@
 <?php
 
 
-namespace MyNamespace;
+namespace MyNamespace\event;
 
 /**
  * 事件配置
@@ -21,6 +21,7 @@ namespace MyNamespace;
 
 class Event
 {
+    const ACTION_NS = __NAMESPACE__.'\\actions';
     static function __callStatic($name, $arguments)
     {
         return [];
@@ -28,7 +29,8 @@ class Event
 
     static function test(){
         return [
-            'requires'=>['test_id','test_name']
+            'requires'=>['test_id','test_name'],
+            'actions'=>['TestAction']
         ];
     }
 

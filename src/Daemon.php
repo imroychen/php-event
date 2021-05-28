@@ -55,7 +55,7 @@ class Daemon
     private function _runItem(){
         $task = Pool::scan();
         if($task){
-            $this->_print('EventMsg:// ID:'.$task['id'].' / event:'.$task['name'].' /args:' . $task['cfg'] ,true);
+            $this->_print('EventMsg:// ID:'.$task['id'].' / event:'.$task['name'].' /args:' . json_encode($task['args']) ,true);
 
             if(empty($this->_listeners)){
                 $this->_listeners = self::getListeners();
@@ -75,8 +75,10 @@ class Daemon
             if(!empty($actions)) {
                 foreach ($actions as $action) {
                     if(isset($tracking[$action]) && $tracking[$action]) {
+
+                    }else{
                         $r = (new $action($event))->exec();
-                        if ($r) {
+                        if ($r || is_null($r)) {//null 没有返回值当成功处理
                             Pool::setRuntimeTracking($task['id'],$action,1);//如果上次意外退出，接着上次继续运行
                         }
                     }
@@ -123,7 +125,14 @@ class Daemon
             $ns = $matches[2];
         }
         $clsName = '';
-        if(stripos($code,'class')) {
+        //尝试从注解中获取
+        if(stripos($code,'@subscriberName')) {
+            preg_match('/\n\s*\*\s*@subscriberName\s+(\w[\w\\\]+)\s+/i', $code, $matches);
+            $clsName = empty($matches[1])?trim($matches[1]):'';
+        }
+
+        //从代码Class Name中获取
+        if(empty($clsName) && stripos($code,'class')) {
             preg_match('%(^|\n)\s*class\s+([\w]+)\W%i', $code, $matches);
             $clsName = $matches[2];
         }
@@ -152,9 +161,9 @@ class Daemon
                 /**
                  * @var Subscriber $cls
                  */
-                $cls = preg_replace('/(\.class)*\.php$/i','',$cls);
-                //try {
-                    //$cls::__check__();
+                $cls = preg_replace('/^class\.|(\.class)*\.php$/i','',$cls);
+                //if($cls::__check__()) {
+                    //try {
                     $obj = new ReflectionClass($cls);
                     $methods = $obj->getMethods();
                     //var_export($methods);
@@ -168,7 +177,8 @@ class Daemon
                             $res[$eventName][$cls] = $m->name;
                         }
                     }
-                //} catch (Exception $e) {
+                    //} catch (Exception $e) {
+                    //}
                 //}
             }
         }
@@ -220,6 +230,7 @@ class Daemon
     static public function start($cmd=''){
         $cmd = trim($cmd);
         if($cmd==='--ls'){
+            echo "cmd :ls\n";
             self::_showEvent();
         }elseif(strpos($cmd,'--event:')===0){
             list(,$event) = explode(':',$cmd);

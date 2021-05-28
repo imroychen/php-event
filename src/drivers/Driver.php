@@ -39,12 +39,9 @@ abstract class Driver
      * 保存一条数据
      * @param array $data [
      *        'name'=>'',
-     *        'sign'=>'',
-     *
-     *        'listener'=>'',     *
      *        'dependency'=>'',
      *      'starting_time'=0,
-     *        'cfg'=>[]
+     *        'args'=>[]
      *    ];
      * @return int id
      */

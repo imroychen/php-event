@@ -64,11 +64,8 @@ class Tp5Db extends Driver
      * 插入事件监听器动作到池中
      * @param array $data [
      *        'name'=>'',
-     *        'sign'=>'',
-     *
-     *        //'listener'=>'',     *
      *        'dependency'=>'',
-     *        'cfg'=>[]
+     *        'args'=>[]
      *    ];
      * @return int
      */

@@ -32,7 +32,9 @@ class Pool
      */
 
 	static function get($id){
-		return self::_driver()->get($id);
+		$r = self::_driver()->get($id);
+        $r['args'] = self::_dataDecode($r['args']);
+        return $r;
 	}
 
 	/**
@@ -54,25 +56,33 @@ class Pool
 	 */
 
 	static function add($data){
+        $data['args']=self::_dataEncode( (isset($data['args'])?$data['args']:[]) );
+        if(!isset($data['id']) || empty($data['id'])){
+            $data['id'] = self::_createSign($data);
+        }
         $id = $data['id'];
-		self::_driver()->create($data);
-		self::setMark($data['starting_time']);
+        $isExist = self::isExist($id);
+
+        if (!$isExist) {
+            self::_driver()->create($data);
+            self::setMark($data['starting_time']);
+        }
 		return $id;//返回ID
 	}
 
 	/**
 	 * 检查事件事件消息否存在
-	 * @param $sign
+	 * @param $id
 	 * @return string false|id
 	 */
 
-	static function isExist($sign){
-		return self::_driver()->isExist($sign);
+	static function isExist($id){
+		return self::_driver()->isExist($id);
 	}
 
 	/**
 	 * 暂停事件事件消息
-	 * @param string $poolId
+	 * @param string $id
 	 * @param int $s 暂停多少秒
 	 * @return bool
 	 */
@@ -131,6 +141,7 @@ class Pool
     static function scan(){
         $r = self::_driver()->scan();
         if(!empty($r) && $r['id']) {
+            $r['args'] = self::_dataDecode($r['args']);
             Pool::pause($r['id'], 20);
         }
         return $r;
@@ -170,15 +181,16 @@ class Pool
 
 
 
-	static function createSign($str){
+	private static function _createSign($data){
+        $str = $data['name'] . '/' .  $data['args'];
 		return strtolower(substr(md5($str),8,16));
 	}
 
-	static function dataEncode($data){
+	private static function _dataEncode($data){
 		return json_encode($data);
 	}
 
-	static function dataDecode($dataStr){
+	private static function _dataDecode($dataStr){
 		return json_decode($dataStr,true);
 	}
 
