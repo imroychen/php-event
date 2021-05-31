@@ -24,5 +24,5 @@ require (dirname(__DIR__)) . '/start.php';
 ]);
 
 //启动守护进程
-$cmd = isset($argv[1])?$argv[1]:'';
-ir\e\Daemon::start($cmd);
+
+ir\e\Daemon::start($argv);

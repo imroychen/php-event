@@ -12,35 +12,18 @@ class Daemon
     private $_timeout = 0;
     private $_enableTimeoutCtrl=false;
     private $_listeners = [];
-    public function __construct($limitTime=-1)
+
+    private $_colorStyle = true;
+    public function __construct($options = [])
     {
-        $status = true;
-        $this->_timeout = time()+$limitTime;
-        $this->_enableTimeoutCtrl = ($limitTime>0);
-        //$this->_listeners = self::getListeners();放在首次有任务的时候计算
-
-        while ($status){
-            $status = self::_runItem();
-            if(!$status){
-                echo '无任务 ['.date('H:i:s')."] \r\n";
-                Pool::setMark(time()+60,true);//如果没有新的事件发生，将会在60秒后重试
-                while (1){
-                    $mark = Pool::getMark();//避免数据库过载
-                    if($mark>time()) {
-                        sleep(1);
-                        echo date('H:i:s')."\r";
-                    }else{
-                        echo "发现新任务\r\n";
-                        $status = true;
-                        break;
-                    }
-
-                    if($this->_isTimeout()){break 2;}
-                }
-            }else{
-                if($this->_isTimeout()){$status = false;}
+        if(!empty($options)){
+            $this->_colorStyle = (isset($options['--color']) && strtolower($options['--color'])==='n')?false:true;
+            if($this->_colorStyle && strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+                echo 'DEVICE=%WinDir%\System32\ANSI.SYS /x >%WinDir%\System32\CONFIG.NT';
+                //装载window彩色驱动
             }
         }
+
     }
 
 
@@ -48,23 +31,44 @@ class Daemon
         return $this->_enableTimeoutCtrl && $this->_timeout<time();
     }
     
-    private function _print($text,$ln=false){
-        echo $text.($ln?"\n":'');
+    private function _print($text,$fgColor=null,$bgColor=null){
+        if($this->_colorStyle){
+            $coloredString = "";
+            // Check if given foreground color found
+            if ($fgColor) {
+                $coloredString .= "\033[" . $fgColor . "m";
+            }
+            // Check if given background color found
+            if ($bgColor) {
+                $coloredString .= "\033[" . $bgColor . "m";
+            }
+            echo $coloredString.$text . "\033[0m";
+        }else{
+            echo $text;
+        }
+    }
+
+    private function _printLn($text,$fgColor=null,$bgColor=null){
+        if($this->_colorStyle){
+           $this->_print($text."\n",$fgColor,$bgColor);
+        }else{
+            echo $text."\n";
+        }
     }
 
     private function _runItem(){
         $task = Pool::scan();
         if($task){
-            $this->_print('EventMsg:// ID:'.$task['id'].' / event:'.$task['name'].' /args:' . json_encode($task['args']) ,true);
+            $this->_printLn('EventMsg:// ID:'.$task['id'].' / event:'.$task['name'].' /args:' . json_encode($task['args']) );
 
             if(empty($this->_listeners)){
-                $this->_listeners = self::getListeners();
+                $this->_listeners = $this->_getListeners();
                 $this->_listeners['__']='';//防止没有数据每次都重新分析
             }
             $eventName = $task['name'];
             $nameLower = strtolower($eventName);
             $listeners = (isset($this->_listeners[$nameLower])&& is_array($this->_listeners[$nameLower]))? $this->_listeners[$nameLower]: [];
-            $this->_print("\tListeners:".(empty($listeners)?'none':implode(',',array_keys($listeners))) ,true);
+            $this->_printLn("\tListeners:".(empty($listeners)?'none':implode(',',array_keys($listeners))));
 
             $tracking = Pool::getRuntimeTracking($task['id']);//如果上次意外退出，接着上次继续运行
             $progress = array_flip($listeners);//记录进度
@@ -88,18 +92,18 @@ class Daemon
             //发送消息到订阅者的监听器
 
             foreach ($listeners as $cls=>$method) {
-                $this->_print( "/".$cls,false);
+                $this->_print( "/".$cls);
                 if(isset($tracking[$cls]) && $tracking[$cls]) {
                     unset($progress[$cls]);
-                    $this->_print( "> skip",false);
+                    $this->_print( "> skip");
                 }else {
                     $listenerObj = new $cls($task['id'],$event);
                     if ($listenerObj->run()) {
                         Pool::setRuntimeTracking($task['id'],$cls,1);//如果上次意外退出，接着上次继续运行
                         unset($progress[$cls]);
-                        $this->_print( "> ok",false);
+                        $this->_print( "> ok");
                     } else {
-                        $this->_print( "> false",false);
+                        $this->_print( "> false");
                     }
                 }
             }
@@ -115,7 +119,7 @@ class Daemon
         return false;
     }
 
-    static private function _getClsByFilePath($f){
+    private function _getClsByFilePath($f){
         $code = preg_replace('%(^|\n)//.*?\n%',"\n",file_get_contents($f));
         $code = preg_replace('%/\*(\w\W)*\*/%',"",$code);
         $matches = [];
@@ -139,7 +143,7 @@ class Daemon
         return $ns.'\\'.$clsName;
     }
 
-    static protected function getListeners(){
+    private function _getListeners(){
         $res = [];
 
         $subscribers = [];
@@ -150,7 +154,7 @@ class Daemon
             //获取订阅这列表
             foreach ($files as $f){
                 //开始分析该订阅者的监听器
-                if($f) $subscribers[] = self::_getClsByFilePath($f);
+                if($f) $subscribers[] = $this->_getClsByFilePath($f);
             }
         }elseif(is_callable($subscribersCfg)){
             $subscribers = call_user_func($subscribersCfg);
@@ -186,8 +190,46 @@ class Daemon
         return $res;
     }
 
-    static private function _showEvent($p=''){
-        $listeners = self::getListeners();
+    /**
+     * 运行守护程序
+     * @param $limitTime
+     */
+    public function run($limitTime=-1){
+        $status = true;
+        $this->_timeout = time()+$limitTime;
+        $this->_enableTimeoutCtrl = ($limitTime>0);
+        //$this->_listeners = $this->_getListeners();放在首次有任务的时候计算
+
+        while ($status){
+            $status = self::_runItem();
+            if(!$status){
+                echo '无任务 ['.date('H:i:s')."] \r\n";
+                Pool::setMark(time()+60,true);//如果没有新的事件发生，将会在60秒后重试
+                while (1){
+                    $mark = Pool::getMark();//避免数据库过载
+                    if($mark>time()) {
+                        sleep(1);
+                        echo date('H:i:s')."\r";
+                    }else{
+                        echo "发现新任务\r\n";
+                        $status = true;
+                        break;
+                    }
+
+                    if($this->_isTimeout()){break 2;}
+                }
+            }else{
+                if($this->_isTimeout()){$status = false;}
+            }
+        }
+    }
+
+    /**
+     * 列出事件 详情
+     * @param string $p
+     */
+    public function ls($p=''){
+        $listeners = $this->_getListeners();
         $eventCls = App::cfg('event');
 
         $funcList = [];
@@ -208,42 +250,83 @@ class Daemon
                     $cfg = $eventCls::$event();
                 }
 
-                echo "\n+------------------------------------------";
-                
-                echo "\n <" . (isset($funcList[$event]) ? $funcList[$event] : $event) . ">\t" . (empty($cfg) ? '--' : json_encode($cfg)) . "\n";
+                $this->_print("\n+------------------------------------------\n");
+                $this->_print( " " . (isset($funcList[$event]) ? $funcList[$event] : $event) . " :",'0;33');
+
+                $this->_print( "\t" . (empty($cfg) ? '--' : json_encode($cfg)) . "\n",'1;30');
 
                 if(!empty($cfg['actions'])) {
-                    echo "actions:\n";
+                    $this->_print( "actions:\n",'0;32');
                     $str = implode('\t\n', $cfg['actions']);
-                    echo $str . "\n\n";
+                    $this->_print( $str . "\n\n");
                 }
-                foreach ($sub as $cls => $func) {
-                    echo "\n\t" . $cls;//.' > '.$func;
+                if(!empty($sub)) {
+                    $this->_print( "\n\tSubscriber:",'0;32');
+                    foreach ($sub as $cls => $func) {
+                        $this->_print("\n\t\t" . $cls);//.' > '.$func;
+                    }
                 }
-                echo "\n";
+                $this->_print( "\n");
             }
-            echo "\n+------------------------------------------\n";
+            $this->_print( "\n+------------------------------------------\n");
         }
-        exit;
     }
 
-    static public function start($cmd=''){
-        $cmd = trim($cmd);
-        if($cmd==='--ls'){
-            echo "cmd :ls\n";
-            self::_showEvent();
-        }elseif(strpos($cmd,'--event:')===0){
-            list(,$event) = explode(':',$cmd);
-            self::_showEvent($event);
+    public function help($argvs){
+        $tpl = implode('  ',$argvs);
+        echo "\n";
+        $this->_print("--ls",'1;33');
+        $this->_printLn("\t\t列出所有事件及监听状态 / List all events and subscription status");
+        $this->_print("\t\teg: ",'0;33');
+        $this->_printLn('php '.str_replace('--help','--ls',$tpl)."\n",'1;30');
+
+        $this->_print("--event:Test",'1;33');
+        $this->_printLn("\t显示Test(指定的)事件及监听状态 / View event information and subscription status");
+        $this->_print("\t\teg: ",'0;33');
+        $this->_printLn('php '.str_replace('--help','--event:test',$tpl)."\n",'1;30');
+
+        $this->_print("--color:y/n",'1;33');
+        $this->_printLn("\tCli模式 是否启用彩色文字 / Output styled information");
+        $this->_print("\t\teg: ",'0;33');
+        $this->_printLn('php '.str_replace('--help','--color:n',$tpl)."\n",'1;30');
+
+        $this->_print("--help",'1;33');
+        $this->_printLn("\t\thelp\n");
+    }
+
+    static public function start($argvs=null){
+        $argvs = (empty($argvs) && isset($_SERVER['argv'])&& is_array($_SERVER['argv']))? $_SERVER['argv']:$argvs;
+
+        $options = [];
+        $len = count($argvs);
+        for($i=1;$i<$len;$i++){
+            if(strpos($argvs[$i],'--')===0){
+                $_tmp = explode(':',$argvs[$i].':');
+                $options[strtolower(trim($_tmp[0]))] = trim($_tmp[1]);
+            }
+        }
+
+        /**
+         * @var $daemon self
+         */
+        $cls = __CLASS__;
+        $daemon = new $cls($options);
+
+        if(isset($options['--ls'])){
+            $daemon->ls();exit;
+        }elseif(isset($options['--event'])){
+            $daemon->ls($options['--event']);exit;
+        }elseif(isset($options['--help'])){
+            $daemon->help($argvs);exit;
         }
         //elseif ($cmd==='....'){}//更多参数
         else {
+            $daemon->run();
             //echo "5秒后启动监听器守护程序，结束请按 < Ctrl + C >\n";
             //for ($i=5;$i>0;$i--){sleep(1);echo $i."\r"; }
 
             //sleep(5);
-            $cls = __CLASS__;
-            new $cls();
+
         }
 
     }
