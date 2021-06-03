@@ -139,30 +139,37 @@ abstract class Db extends Driver
      * 插入事件消息到池中
      * @param array $data [
      *        'name'=>'',
-     *
-     *        //'listener'=>'',     *
      *        'dependency'=>'',
-     *         'starting_time'
      *        'args'=>[]
      *    ];
+     * @param int $time 时间戳
      * @return string $id
      */
-    public function create($data)
+    public function create($data,$time)
     {
         if(!empty($data)) {
+            $data['starting_time'] = $time;
+            $data['id'] = $this->_createUniqId($data);
             $id = $data['id'];
-            $fields = '';
-            $values = '';
-            foreach ($data as $f => $v) {
-                $fields[] = '`' . $f . '`';
-                $values[] = var_export($v, true);
+
+            $exist = $this->_exist($id);
+
+            if (!$exist) {
+                $fields = '';
+                $values = '';
+                foreach ($data as $f => $v) {
+                    $fields[] = '`' . $f . '`';
+                    $values[] = var_export($v, true);
+                }
+                $fieldsStr = implode(',',$fields);
+                $valuesStr = implode(',',$values);
+                $res = $this->_exec($this->_sql('insert into {{table}} (' . $fieldsStr . ') values (' . $valuesStr.')'),'insert');
+                return $res ? $id:false;
             }
-            $fieldsStr = implode(',',$fields);
-            $valuesStr = implode(',',$values);
-            $res = $this->_exec($this->_sql('insert into {{table}} (' . $fieldsStr . ') values (' . $valuesStr.')'),'insert');
-            return $res ? $id:false;
+
+            return $id;
         }
-        return true;
+        return false;
     }
 
     /**
@@ -171,7 +178,7 @@ abstract class Db extends Driver
      * @return bool|string false|id
      */
 
-    public function isExist($id)
+    private function _exist($id)
     {
         $id = var_export(strval($id),true);
         $_res = $this->_getRecord($this->_sql('select `id` from {{table}} where `id`='.$id));

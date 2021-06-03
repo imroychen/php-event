@@ -3,28 +3,36 @@
 
 namespace ir\e\drivers;
 
+use ir\e\App;
+
 /**
  * Redis 驱动
+ * @Redis?host=localhost&port=6379&key=ir-e-store&password=123
  * @package ir\e\drivers
- * @example new Redis('host=localhost;port=3307;dataset=ir-e-store')
  */
 class Redis extends Driver
 {
     protected $_dataset, $_dataset_bak;
+    /**
+     * @var \Redis
+     */
     protected $_redis;
 
 
     /**
      * Redis constructor.
      * @param array $args
-     * @param string $rawArgs 'host=localhost;port=3307;dataset=ir-e-store'
+     * @param string $rawArgs 'host=localhost&port=6379&key=ir-e-store&password=123'
      */
     protected function _init($args,$rawArgs)
     {
-        $this->_dataset = (isset($args['dataset']) && !empty($args['dataset']))? preg_replace('[^\w\-]','',$args['dataset']):'ir-e-store';
+        $this->_dataset = (isset($args['key']) && !empty($args['key']))? preg_replace('[^\w\-]','',$args['key']):'ir-e-store';
         $this->_dataset_bak = $this->_dataset.'-bak';
         $this->_redis = new \Redis();
-        $this->_redis->connect($args['host'], $args['port']);
+        $this->_redis->connect($args['host'], (isset($args['port'])?$args['port']:6379) );
+        if(isset($args['password'])) {
+            $this->_redis->auth($args['password']);
+        }
     }
 
     /**
@@ -50,36 +58,21 @@ class Redis extends Driver
 
     /**
      * 插入事件监听器动作到池中
-     * @param array $data [
-     *        'name'=>'',
-     *        'dependency'=>'',
-     *        'args'=>[]
-     *    ];
+     * @param array $data [];
+     * @param int $time 时间戳
      * @return int
      */
-    public function create($data)
+    public function create($data,$time)
     {
         if (!empty($data)) {
-            $startingTime = isset($data['string_time'])?$data['string_time']:0;
-            $startingTime = $startingTime<1?1:$startingTime;
+            $time = $time<1 ? (time()-1) : intval($time);
             $str = json_encode($data);
+            $this->_redis->zAdd($this->_dataset, $time,$str);
+            return $str;
         }
-        $this->_redis->zAdd($this->_dataset, $startingTime,$str);
-        return $str;
-    }
-
-
-    /**
-     * 检查事件监听器动作否存在
-     * @param $sign
-     * @return  mixed false|id
-     */
-
-    public function isExist($sign)
-    {
         return false;
-        //$res = $redis->zScore($this->_dataset, "three");
     }
+
 
     /**
      * 暂停事件监听器动作
@@ -90,9 +83,8 @@ class Redis extends Driver
 
     public function setStartingTime($id, $time)
     {
-        $data = $this->get($id);
-        $data['starting_time'] = $time;
-        $this->create($data);
+        $this->_redis->zAdd($this->_dataset, $time,$id );
+        return true;
     }
 
     /**
@@ -101,12 +93,47 @@ class Redis extends Driver
 
     public function scan()
     {
-        $time = time();
-        $res = $this->_redis->zAdd($this->_dataset, 0,$time,['limit' => [0, 1]]);
-        if($res){
-            $this->_redis->zAdd($this->_dataset_bak, $time+300, $res);
-            return $this->get($res);
+        $record = $this->_redis->zRange($this->_dataset, 0, 1, true);
+        $time = current($record);
+        $text = key($record);
+        if($time<time()){
+            $res = json_decode($text,true);
+            if(is_array($res)){
+                $res['id'] = $text;
+                return $res;
+            }
         }
         return false;
+    }
+
+    //========================重写新数据标记方法========================
+    public function getMark(){
+        return $this->_redis->get($this->_dataset.'__ir-e-mark');
+    }
+
+    public function setMark($time){
+        $key = $this->_dataset.'__ir-e-mark';
+        $lastTime =  $this->_redis->get($key);
+        $this->_redis->set($key,min($time,intval($lastTime)));
+    }
+
+    //========================重写消息广播过程跟踪========================
+
+    public function getRuntimeTracking($id){
+        $key = 'ir-e'.md5($id);
+        $r = $this->_redis->get($key);
+        return empty($r)? unserialize($r):[];
+    }
+
+    public function setRuntimeTracking($id,$listener,$status){
+        $key = 'ir-e'.md5($id);
+        $r = $this->_redis->get($key);
+        $r[$listener] = $status;
+        $this->_redis->set($key,serialize($r));
+    }
+
+    public function rmRuntimeTracking($id){
+        $key = 'ir-e'.md5($id);
+        $this->_redis->del($key);
     }
 }

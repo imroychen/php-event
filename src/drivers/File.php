@@ -87,29 +87,35 @@ class File extends Driver
      *        'dependency'=>'',
      *        'args'=>[]
      *    ];
+     * @param $startTime 时间戳
      * @return int
      */
-    public function create($data)
+    public function create($data,$startTime)
     {
-        $id = $data['sign'];
+        $data['id'] = $this->_createUniqId($data);
+        $id = $data['id'];
+        if(!$this->_exist($id)) {
+            $startTime = ($startTime > 0) ? intval($startTime) : time();
 
-        $data['id'] = $id;
-        $data['args'] = array_merge(['args'=>[]],$data);
-        $dataStr = serialize($data);
+            $data['starting_time'] = $startTime;
+            $data['args'] = array_merge(['args' => []], $data);
+            
+            $dataStr = serialize($data);
 
-        $fIdx = $this->_file('@index');
-        $startTime = (isset($data['starting_time']) && $data['starting_time']>0)? ($data['starting_time']+0): 1;
+            $fIdx = $this->_file('@index');
 
-        $f = $this->_file($id);
-        $dir = dirname($f);
 
-        if(!is_dir($dir)){
-            mkdir($dir,0777,true);
-            chmod($dir,0777);
-        }
-        file_put_contents($f,$dataStr);
-        if(strpos(file_get_contents($fIdx),$id)===false) {
-            file_put_contents($fIdx, "\n$id,$startTime|" , FILE_APPEND);
+            $f = $this->_file($id);
+            $dir = dirname($f);
+
+            if (!is_dir($dir)) {
+                mkdir($dir, 0777, true);
+                chmod($dir, 0777);
+            }
+            file_put_contents($f, $dataStr);
+            if (strpos(file_get_contents($fIdx), $id) === false) {
+                file_put_contents($fIdx, "\n$id,$startTime|", FILE_APPEND);
+            }
         }
         return $id;
     }
@@ -117,13 +123,12 @@ class File extends Driver
 
     /**
      * 检查事件监听器动作否存在
-     * @param $sign
+     * @param $id
      * @return  mixed false|id
      */
 
-    public function isExist($sign)
+    private function _exist($id)
     {
-        $id = $sign;
         $f = $this->_file($id);
         if(file_exists($f)){
             return $id;

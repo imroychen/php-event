@@ -85,12 +85,11 @@ class App
             if ($event) {
                 $data = [
                     'name' => $event,
-                    'starting_time' => time() + $delay,
                     'dependency' => $dependency,
                     'args' => $args
                 ];
                 //$data['args'] = Pool::dataEncode($args);
-                return Pool::add($data);
+                return Pool::add($data,time() + $delay);
             }
         }
         return false;

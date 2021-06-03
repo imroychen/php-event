@@ -88,7 +88,6 @@ class Daemon
                     }
                 }
             }
-
             //发送消息到订阅者的监听器
 
             foreach ($listeners as $cls=>$method) {

@@ -20,7 +20,6 @@ class Pool
             unset($driver[0]);
             $args = count($driver) > 0 ? implode('?', $driver) : '';
             self::$_driver = new $cls($args);
-            self::resetRuntimeTracking(0);
         }
         return self::$_driver;
     }
@@ -44,8 +43,9 @@ class Pool
 	 */
 
 	static function remove($id){
-	    self::resetRuntimeTracking($id);
-        return self::_driver()->remove($id);
+        $driver = self::_driver();
+        $driver->rmRuntimeTracking($id);
+        return $driver->remove($id);
 	}
 
 	/**
@@ -55,29 +55,12 @@ class Pool
 	 * @return string
 	 */
 
-	static function add($data){
+	static function add($data,$time){
         $data['args']=self::_dataEncode( (isset($data['args'])?$data['args']:[]) );
-        if(!isset($data['id']) || empty($data['id'])){
-            $data['id'] = self::_createSign($data);
-        }
-        $id = $data['id'];
-        $isExist = self::isExist($id);
-
-        if (!$isExist) {
-            self::_driver()->create($data);
-            self::setMark($data['starting_time']);
-        }
+        $driver = self::_driver();
+        $id = $driver->create($data,$time);
+        $driver->setMark($time);
 		return $id;//返回ID
-	}
-
-	/**
-	 * 检查事件事件消息否存在
-	 * @param $id
-	 * @return string false|id
-	 */
-
-	static function isExist($id){
-		return self::_driver()->isExist($id);
 	}
 
 	/**
@@ -89,56 +72,17 @@ class Pool
 
 	static function pause($id,$s){
         $time = time()+$s;
-		self::setMark($time);
-		return self::_driver()->setStartingTime($id,$time);
+        $driver = self::_driver();
+        $driver->setMark($time);
+		return $driver->setStartingTime($id,$time);
 	}
-
-    /**
-     * @param string $id 事件ID
-     * @return array
-     */
-
-	static function getRuntimeTracking($id){
-        $file = App::cfg('temp_path') . DIRECTORY_SEPARATOR . 'event_runtime_tracking';
-        $text = file_get_contents($file);
-	    $list = explode("\n",$text);
-	    $r = [];
-	    foreach ($list as $v){
-	        if($v!='' && strpos($v,',')) {
-                list($id, $listener,$status) = explode(',', $v);
-                $r[$id][$listener] = $status;
-            }
-        }
-	    return isset($r[$id])? $r[$id]:[];
-
-    }
-	static function setRuntimeTracking($id,$listener,$status = 1){
-	    file_put_contents(App::cfg('temp_path').DIRECTORY_SEPARATOR.'event_runtime_tracking',"\n".$id.','.$listener.','.$status,FILE_APPEND);
-    }
-    static function resetRuntimeTracking($id){
-        $file = App::cfg('temp_path') . DIRECTORY_SEPARATOR . 'event_runtime_tracking';
-
-        if(file_exists($file)) {
-            $list = explode("\n", file_get_contents($file));
-            $r = [];
-            foreach ($list as $v) {
-                if ($v != '' && strpos($v, $id . ',') !== 0) {
-                    $r[] = $v;
-                }
-            }
-            file_put_contents($file,implode("\n",$r));
-        }else{
-            file_put_contents($file,"");
-        }
-
-
-    }
 
     /**
      * 扫描可运行的任务
      * @return mixed
      */
     static function scan(){
+
         $r = self::_driver()->scan();
         if(!empty($r) && $r['id']) {
             $r['args'] = self::_dataDecode($r['args']);
@@ -147,38 +91,25 @@ class Pool
         return $r;
     }
 
-    /**
-     * 临时目录 确保 WEB 和 CLI 都能操作该文件
-     * @return string
-     */
-    static private function _getMarkPath(){
-        return App::cfg('temp_path') .DIRECTORY_SEPARATOR. 'event-queue-mark';
+    static function setMark($time){
+        self::_driver()->setMark($time);
     }
 
-	static function setMark($time,$compulsory=false){
-		$f = self::_getMarkPath();
+    static function getMark(){
+        self::_driver()->getMark();
+    }
 
-		if($compulsory){
-			file_put_contents($f, $time);
-		}else {
-			$content = file_get_contents($f);
-			if (!empty($content)) {
-				$val = min(intval($content), $time);
-			} else {
-				$val = $time;
-			}
-			file_put_contents($f, $val);
-		}
+    /**
+     * @param $id
+     * @return array
+     */
+    static function getRuntimeTracking($id){
+        return self::_driver()->getRuntimeTracking($id);
+    }
 
-		return true;
-	}
-
-	static function getMark(){
-        $f = self::_getMarkPath();
-		$content = file_get_contents($f);
-		return intval($content);
-	}
-
+    static function setRuntimeTracking($id,$val,$status=1){
+        return self::_driver()->setRuntimeTracking($id,$val,$status);
+    }
 
 
 	private static function _createSign($data){

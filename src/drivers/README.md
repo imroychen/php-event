@@ -50,17 +50,7 @@ class MyDriver extends Driver{
         public function create($data){
             //return id|false;
         }
-    
-        /**
-         * 检查事件监听器动作否存在
-         * @param $sign
-         * @return mixed false | id(不可使用0作为ID 0视为false)
-          */
-    
-        public function isExist($sign)
-        {
-            //return false|id
-        }
+   
     
         /**
          * 修改事件的广播消息时间  暂停事件或者延时的时候使用
