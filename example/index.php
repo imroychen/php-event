@@ -2,7 +2,7 @@
 
 require (dirname(__DIR__)).'/start.php';
 
-ir\e\App::setCfg('\'\\MyNamespace\\event\\Config');
+ir\e\App::setCfg('\\MyNamespace\\event\\Config');
 
 
 spl_autoload_register(function ($class) {

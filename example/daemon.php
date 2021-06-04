@@ -17,6 +17,6 @@ require (dirname(__DIR__)) . '/start.php';
 
 //-------------------------
 //系统配置
-ir\e\App::setCfg('\'\\MyNamespace\\event\\Config');
+ir\e\App::setCfg('\\MyNamespace\\event\\Config');
 //启动守护进程
 ir\e\Service::start($argv);

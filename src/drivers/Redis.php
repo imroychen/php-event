@@ -53,8 +53,6 @@ class Redis extends Driver
     public function remove($id)
     {
         $res = $this->_redis->zRem($this->_dataset, $id);
-        echo "================REM=========================\n";
-        var_export($res);
         return $res? true:false;
     }
 
