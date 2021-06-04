@@ -71,13 +71,12 @@ abstract class Driver
 
     /**
      * 临时目录 确保 WEB 和 CLI 都能操作该文件
+     * @param int $time
+     * @param bool $compulsory
      * @return string
      */
-    static private function _getMarkPath(){
-        return App::cfg('temp_path') .DIRECTORY_SEPARATOR. 'event-queue-mark';
-    }
     function setMark($time,$compulsory){
-        $f = self::_getMarkPath();
+        $f = App::getTempPath( 'ir-e_event-queue-mark');
 
         if($compulsory){
             file_put_contents($f, $time);
@@ -95,7 +94,7 @@ abstract class Driver
     }
 
     function getMark(){
-        $f = self::_getMarkPath();
+        $f = App::getTempPath( 'ir-e_event-queue-mark');
         $content = file_get_contents($f);
         return intval($content);
     }
@@ -109,7 +108,7 @@ abstract class Driver
      */
 
     function getRuntimeTracking($id){
-        $file = App::cfg('temp_path') . DIRECTORY_SEPARATOR . 'ir-e-t_'.md5($id);
+        $file = App::getTempPath( 'ir-e-t_'.md5($id));
         if(file_exists($id)){
             $text = file_get_contents($file);
             $r = unserialize($text);
@@ -119,13 +118,13 @@ abstract class Driver
     }
     
     function setRuntimeTracking($id,$listener,$status){
-        $file = App::cfg('temp_path') . DIRECTORY_SEPARATOR . 'ir-e-t_'.md5($id);
+        $file = App::getTempPath( 'ir-e-t_'.md5($id));
         $val = $this->get($id);
         $val[$listener] = $status;
         file_put_contents($file,serialize($val));
     }
     function rmRuntimeTracking($id){
-        $file = App::cfg('temp_path') . DIRECTORY_SEPARATOR . 'ir-e-t_'.md5($id);
+        $file = App::getTempPath( 'ir-e-t_'.md5($id));
         unlink($file);
     }
 }

@@ -1,4 +1,5 @@
 <?php
+//MyNamespace autoLoad
 spl_autoload_register(function ($class) {
     $classPath = str_replace('\\','/',rtrim($class,'\\'));
     if(strpos($classPath,'MyNamespace')===0 && !class_exists($class,false)){
@@ -10,20 +11,12 @@ spl_autoload_register(function ($class) {
 if(substr(PHP_SAPI_NAME(),0,3) !== 'cli'){
     exit("请在CLI下运行 / The program runs only in CLI mode!");
 }
+
 chdir(__DIR__);
 require (dirname(__DIR__)) . '/start.php';
 
 //-------------------------
 //系统配置
-\ir\e\App::setCfg([
-    'subscribers' => 'files:' . __DIR__ . '/event/subscribers/*.php',
-    'event' => '\\MyNamespace\\event\\Event',
-    //'store_driver'=>'\\MyNamespace\\Driver',
-    'store_driver'=>'@Sqlite?dsn=sqlite:'.__DIR__.'/database/sqlite.db&table=ir_event_pool',    //事件消息存储仓库驱动
-    //'store_driver'=>'@Redis?host=localhost&port=6379&password=xacegikm&key=ir-e-store',
-    //'temp_path'=>'/tmp',//项目可写入的临时目录， 可选 默认系统的临时目录
-]);
-
+ir\e\App::setCfg('\'\\MyNamespace\\event\\Config');
 //启动守护进程
-
 ir\e\Service::start($argv);

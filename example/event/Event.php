@@ -21,7 +21,6 @@ namespace MyNamespace\event;
 
 class Event
 {
-    const ACTION_NS = __NAMESPACE__.'\\actions';
     static function __callStatic($name, $arguments)
     {
         return [];

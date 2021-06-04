@@ -157,18 +157,16 @@ class Service
     private function _getListeners(){
         $res = [];
 
-        $subscribers = [];
-        $subscribersCfg = App::cfg('subscribers');
-        if(is_string($subscribersCfg) && strpos($subscribersCfg,'files:')===0){
-            $path = str_replace('^files:','','^'.$subscribersCfg);
+        $subscribers = App::cfg()->getSubscribers();
+        if(is_string($subscribers) && strpos($subscribers,'files:')===0){
+            $path = str_replace('^files:','','^'.$subscribers);
             $files = glob($path);
             //获取订阅这列表
+            $subscribers = [];
             foreach ($files as $f){
                 //开始分析该订阅者的监听器
                 if($f) $subscribers[] = $this->_getClsByFilePath($f);
             }
-        }elseif(is_callable($subscribersCfg)){
-            $subscribers = call_user_func($subscribersCfg);
         }
         //var_export($subscribers);
         if(count($subscribers)>0) {
@@ -241,7 +239,7 @@ class Service
      */
     public function ls($p=''){
         $listeners = $this->_getListeners();
-        $eventCls = App::cfg('event');
+        $eventCls = App::cfg()->getEventRules();
 
         $funcList = [];
         $_tmp = get_class_methods($eventCls);

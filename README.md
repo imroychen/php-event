@@ -27,34 +27,54 @@ compoer update
 ### 2. 配置设置
 在公共文件*`(单入口文件的项目建议在入口文件 )`*中加入如下代码. [示例](./example/index.php)
 ```php
-ir\e\App::setCfg([
-     'event'=>'',//事件规则配置Class
-     'store_driver'=>'\\MyNamespace\event\\Driver',//事件消息存储仓库驱动
-     'subscribers'=>'callback | string (files:subscriber绝对目录/*.php)',
-     'temp_path'=>'/tmp',//项目可写入的临时目录， 可选 默认系统的临时目录
-]);
+// MyNamespace\event\Config为示例名称请修改自己的Class名称
+ir\e\App::setCfg('\\MyNamespace\\event\\Config');//参数为 Class带命名空间的全名称
 ```
-**event:** 请参考[./example/event/Event.php](./example/event/Event.php)<br><br>
-**store_driver:** 
-    //该应用中内置了 Db （Sql DB），Sqlite，Redis，DbForLaravel ,DbForTp等驱动。<br>
-    内置驱动使用方法：'store_driver'=>'@DbForLaravel?table=event_store', 表示使用内置的驱动（DbForLaravel）参数(表)为event_store
-    <br> 更多内置驱动请参考[./src/drivers/RADME.md](./src/drivers/RADME.md)
-   <br> <br>
-**subscribers:**
-callable | string 如:files:subscriber目录/*.php(会自动从这些文件的代码中分析出来Class全名)
-```php
-// callable// callback function
-function(){
-        //这里仅仅是一个实例 
-        $result=[];
-        $files = glob(__DIR__.'/subscriber/*.php');
-        foreach ($files as $f) $result[] = '\\MyNamespace\\'.str_replace('.php','',basename($f));
-        return $result;
-}
 
-//string 格式：(files:subscriber目录/*) 如下示例:
-'files:'.__DIR__.'/subscriber/*.php';
+### 3. \\MyNamespace\event\\Config
 ```
+namespace \\MyNamespace\event;
+class Config implements \ir\e\Config{
+   public function getPoolDriver()
+   public function getSubscribers(){}
+   public function getEventRules(){}
+   public function getActionNs(){}
+   public function getTempPath(){}
+   public function getLogPath(){}
+
+}
+```
+Config接口请参考: [./src/Config.php](./src/Config.php)<br><br>
+接口实现示例请参考: [./example/event/Config.php](./example/event/Config.php)<br><br>
+#### 方法
+**public function getPoolDriver()**
+
+该应用中内置了 Db （Sql DB），Sqlite，Redis，DbForLaravel ,DbForTp等驱动。<br>
+内置驱动使用方法：'store_driver'=>'@DbForLaravel?table=event_store', 表示使用内置的驱动（DbForLaravel）参数(表)为event_store
+<br> 更多内置驱动请参考[./src/drivers/RADME.md](./src/drivers/RADME.md)
+
+**public function getSubscribers()**
+
+返回类型 array（推荐）  class列表: ['class1','class2'];<br>
+或者返回string <br>
+如: <u>_files:subscriber目录/*.php_</u> (会自动从这些文件的代码中分析出来Class全名)
+
+**public function getEventRules()**
+
+返回类型："string", 返回一个 事件规则的Class名称，请参考[./example/event/Event.php](./example/event/Event.php)<br><br>
+
+**public function getActionNs()**
+
+返回类型："string"
+
+**public function getTempPath()**
+
+返回类型："string",返回一个目录路径的，结尾不要加“/”。 如：_/tmp_<br><br>
+
+**public function getLogPath()**
+
+返回类型："string",返回一个目录路径的，结尾不要加“/”。为空不记录日志  如：_/tmp/logs_<br><br>
+
 
 ### 3. 触发事件
 

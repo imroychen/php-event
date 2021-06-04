@@ -15,7 +15,13 @@ class Pool
     static private function _driver(){
 
         if(empty(self::$_driver)){
-            $driver = explode('?', App::cfg('store_driver'));
+            $driverCfg = App::cfg()->getPoolDriver();
+            if ($driverCfg[0] === '@') {
+                $driverCfg = str_replace('^@',__NAMESPACE__ . '\\drivers\\','^'.$driverCfg);
+            }
+
+            $driver = explode('?', $driverCfg);
+
             $cls = $driver[0];
             unset($driver[0]);
             $args = count($driver) > 0 ? implode('?', $driver) : '';

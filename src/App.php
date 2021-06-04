@@ -13,53 +13,26 @@ class App
      *      event=>'事件配置文件'
      * ]
      */
-    static private  $_cfg = [];
-    static public function setCfg($cfg){
-        if(!empty($cfg)) {
-            if (isset($cfg['temp_path'])) {
-                $cfg['temp_path'] = rtrim($cfg['temp_path'], '/\\');
-            }
-
-            if (isset($cfg['store_driver'])) {
-                if ($cfg['store_driver'][0] === '@') {
-                    $cfg['store_driver'] = str_replace('^@',__NAMESPACE__ . '\\drivers\\','^'.$cfg['store_driver']);
-                }
-            }
-
-            self::$_cfg = array_merge(self::$_cfg, $cfg);
-        }
-
-        if(!isset(self::$_cfg['temp_path'])){
-            self::$_cfg['temp_path'] = sys_get_temp_dir();
-        }
-
-        if(!isset(self::$_cfg['store_driver'])){//智能选择驱动
-            if(defined('THINK_PATH') && defined(THINK_VERSION )){
-                //thinkphp <5.1
-                $info = explode('.',THINK_VERSION.'.0.0.0');
-                $info = array_map('intval',$info);
-                $version = $info[0]*1000*1000 + $info[1]*1000 + $info[2];
-                //000 000 000
-                if($version<5000000){
-                    self::$_cfg['store_driver']=__NAMESPACE__ . '\\drivers\\DbForTp3';
-                }else{
-                    self::$_cfg['store_driver']=__NAMESPACE__ . '\\drivers\\DbForTp';
-                }
-            }elseif (class_exists('\\think\\Db')){ //thinkphp >5.1
-                self::$_cfg['store_driver']=__NAMESPACE__ . '\\drivers\\DbForTp';
-            }elseif (class_exists('\\Illuminate\\Support\\Facades\\DB')){ //laravel >5.1
-                self::$_cfg['store_driver']=__NAMESPACE__ . '\\drivers\\DbForLaravel';
-            }else{
-
-            }
-        }
+    static private  $_cfgCls='';
+    static private $_cfgObj;
+    static public function setCfg($cls){
+        self::$_cfgCls = $cls;
     }
 
+    /**
+     * @param $key
+     * @return Config
+     */
     static public function cfg($key){
-        if(!empty(self::$_cfg)){
-            self::setCfg([]);
+        if(!is_object(self::$_cfgObj)){
+            $cfgCls = self::$_cfgCls;
+            self::$_cfgObj = new $cfgCls();
         }
-        return isset(self::$_cfg[$key])?self::$_cfg[$key]:false;
+        return self::$_cfgObj;
+    }
+
+    static public function getTempPath($file=''){
+        return self::cfg()->getTempPath().(empty($file)?'': (DIRECTORY_SEPARATOR.$file) );
     }
 
     /**
@@ -74,7 +47,7 @@ class App
         $checkRes = true;//$this->_checkArgs($args);
         if($checkRes) {
             //在不改变原代码结构的情况下，注入自己的代码
-            $cls = self::cfg('event');
+            $cls = self::cfg()->getEventRules();
             $eventInfo  = method_exists($cls,$event)?$cls::$event():[];
             if(isset($eventInfo['exec']) && count($eventInfo['exec'])>0){
                 foreach ($eventInfo['exec'] as $cls){

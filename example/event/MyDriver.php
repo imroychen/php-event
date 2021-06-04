@@ -3,7 +3,12 @@ namespace MyNamespace\event;
 
 use ir\e\drivers;
 
-class Driver extends drivers\Db
+/**
+ * Class MyDriver
+ * 这是一个自定义驱动示例
+ * @package MyNamespace\event
+ */
+class MyDriver extends drivers\Db
 {
     private $_db;
     protected function _init($args, $rawArgs)

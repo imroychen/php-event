@@ -40,14 +40,16 @@ class Event
     function __construct($eventName,$args)
     {
         $this->_eventName = $eventName;//strtolower($eventName);
-        $eventCfgCls = App::cfg('event');
+        $eventCfgCls = App::cfg()->getEventRules();
 
         if(!empty($eventCfgCls) && method_exists($eventCfgCls,$this->_eventName)) {
             $this->_eventConfig = call_user_func([$eventCfgCls, $this->_eventName]);
-            if(!empty($this->_eventConfig['actions']) && defined($eventCfgCls.'::ACTION_NS') && $eventCfgCls::ACTION_NS) {
+            $actionNs =  App::cfg()->getActionNs();
+            if(!empty($this->_eventConfig['actions'])) {
                 foreach ($this->_eventConfig['actions'] as $key=>$cls) {
+                    //auto append ns
                     if (strstr($cls,'\\')===false) {
-                        $this->_eventConfig['actions'][$key] = $eventCfgCls::ACTION_NS .'\\'. $cls;
+                        $this->_eventConfig['actions'][$key] = $actionNs .'\\'. $cls;
                     }
                 }
             }
