@@ -35,29 +35,51 @@ ir\e\App::setCfg([
 ]);
 ```
 
-
-**event:** Example[./example/event/Event.php](./example/event/Event.php)<br><br>
-**store_driver:** 
-    //This package contains the following built-in drivers (DB (Sql DB), Sqlite, Redis, DbForLaravel, DbForTp).<br>
-    Custom drive:  'store_driver'=>'Class Name(Contains namespace)'
-    Built-in drive: 'store_driver'=>'@DbForLaravel?table=event_store'
-    <br> For more built-in drivers, please refer to[./src/drivers/RADME.md](./src/drivers/RADME.md)
-   <br> <br>
-**subscribers:**
-callable | string eg: files:subscriberPATH/*.php(The Class name will be automatically analyzed from the code of these files)
-```php
-// callable// callback function
-function(){
-        //This is just an example
-        $result=[];
-        $files = glob(__DIR__.'/subscriber/*.php');
-        foreach ($files as $f) $result[] = '\\MyNamespace\\'.str_replace('.php','',basename($f));
-        return $result;
-}
-
-//string (files:subscriber PATH/*):
-'files:'.__DIR__.'/subscriber/*.php';
+### 3. \\MyNamespace\event\\Config
 ```
+namespace \\MyNamespace\event;
+class Config implements \ir\e\Config{
+   public function getPoolDriver()
+   public function getSubscribers(){}
+   public function getEventRules(){}
+   public function getActionNs(){}
+   public function getTempPath(){}
+   public function getLogPath(){}
+
+}
+```
+Interface : [./src/Config.php](./src/Config.php)<br><br>
+Please refer to the interface docking example: [./example/event/Config.php](./example/event/Config.php)<br><br>
+#### 方法
+**public function getPoolDriver()**
+
+ //This package contains the following built-in drivers (DB (Sql DB), Sqlite, Redis, DbForLaravel, DbForTp).<br>
+    Custom drive:  'Class Name(Contains namespace)'
+    Built-in drive: '@DbForLaravel?table=event_store'
+    <br> For more built-in drivers, please refer to[./src/drivers/RADME.md](./src/drivers/RADME.md)
+
+**public function getSubscribers()**
+
+return array（recommended）|string<br>
+  array: class list []: ['class1','class2'];<br>
+  string: Example: <u>_files:Subscriber Path/*.php_</u> (Automatically analyze the full name of the class from the code of these files)
+
+**public function getEventRules()**
+
+return ："string", Class Name，Example[./example/event/Event.php](./example/event/Event.php)<br><br>
+
+**public function getActionNs()**
+
+return："string"
+
+**public function getTempPath()**
+
+return："string",Return a directory path, do not add "/" at the end。 Example：_/tmp_<br><br>
+
+**public function getLogPath()**
+
+return："string",Return a directory path, do not add "/" at the end。 Example：_/tmp_<br><br>
+
 
 ### 3. Fire EVENT
 
@@ -76,11 +98,11 @@ An event dependency chain will be automatically formed to ensure the sequence of
 use ir\e\Fire; 
 
 $fire = new Fire();
-$fire ->start('beforeRequest',['参数1','...']);
+$fire ->start('beforeRequest',['arguments1','...']);
     //... Your code
-$fire ->then('afterRequest',['参数1','...']);
+$fire ->then('afterRequest',['arguments1','...']);
     //... Your code
-$fire ->then('complete',['参数1','...']);
+$fire ->then('complete',['arguments1','...']);
 //The broadcast sequence is:
 // beforeRequest > afterRequest > complete
 
