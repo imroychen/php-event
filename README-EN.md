@@ -27,12 +27,7 @@ compoer update
 
 # Add configuration
 ```php
-ir\e\App::setCfg([
-     'event'=>'',//Event rules (Class File)
-     'store_driver'=>'\\MyNamespace\event\\Driver',//Event message pool driver (Storage drive)
-     'subscribers'=>'callback | string (files:subscriber PATH/*.php)',
-     'temp_path'=>'/tmp',//[Optional] Writable temporary directory, default system temporary directory
-]);
+ir\e\App::setCfg('\\MyNamespace\\event\\Config');
 ```
 
 ### 3. \\MyNamespace\event\\Config
