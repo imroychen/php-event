@@ -31,7 +31,7 @@ compoer update
 ir\e\App::setCfg('\\MyNamespace\\event\\Config');//参数为 Class带命名空间的全名称
 ```
 
-### 3. \\MyNamespace\event\\Config
+### 3. 创建 Class \\MyNamespace\event\\Config
 ```
 namespace \\MyNamespace\event;
 class Config implements \ir\e\Config{

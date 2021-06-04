@@ -30,7 +30,7 @@ compoer update
 ir\e\App::setCfg('\\MyNamespace\\event\\Config');
 ```
 
-### 3. \\MyNamespace\event\\Config
+### 3. Create class \\MyNamespace\event\\Config
 ```
 namespace \\MyNamespace\event;
 class Config implements \ir\e\Config{
