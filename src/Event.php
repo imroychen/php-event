@@ -2,12 +2,10 @@
 /**
  * User: roy
  * Date: 2017/2/24
- * Time: 16:41
+ * Time: 20:41
  */
 
 namespace ir\e;
-
-use phpseclib3\Net\SFTP\Stream;
 
 class Event
 {
@@ -38,10 +36,6 @@ class Event
         return false;
     }
 
-    function getName(){
-        return $this->_eventName;
-    }
-
 
     function __construct($eventName,$args)
     {
@@ -61,21 +55,24 @@ class Event
         $this->_args = $args;
     }
 
-    function getListeners(){
-        /*$name = $this->getName();
-        $listenersList = include (__DIR__.'/Listeners.php');
-        $append = [];
-        if(is_array($listenersList) && isset($listenersList[$name])) {
-            $append = $listenersList[$name];
-        }
-        $r = array_merge($this->_listeners, $append);
-        return array_unique($r);
-        */
+    /**
+     * 获取事件名称
+     * @return string
+     */
+    function getName(){
+        return $this->_eventName;
     }
 
-    function getResult(){}
+    /**
+     * 预留方法
+     */
+    public function getResult(){}
 
-    function getActions(){
+    /**
+     * 获取绑定的动作
+     * @return array
+     */
+    public function getActions(){
         if(isset($this->_eventConfig['actions'])) {
             return $this->_eventConfig['actions'];
         }else{
@@ -87,10 +84,10 @@ class Event
      * @param string $key
      * @param mixed $default default null
      * @param null|callable $filter default null
-     * @return mixed|null
+     * @return mixed
      */
 
-    function get($key,$default=null,$filter=null){
+    public function get($key,$default=null,$filter=null){
         if(isset($this->_args[$key])){
             if(is_callable($filter)){
                 return call_user_func($filter,$this->_args[$key]);
@@ -99,6 +96,8 @@ class Event
         }
         return $default;
     }
+
+    public function getAll(){return $this->_args;}
 
     /**
      * @param string $event

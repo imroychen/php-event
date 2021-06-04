@@ -59,7 +59,7 @@ class Pool
         $data['args']=self::_dataEncode( (isset($data['args'])?$data['args']:[]) );
         $driver = self::_driver();
         $id = $driver->create($data,$time);
-        $driver->setMark($time);
+        $driver->setMark($time,false);
 		return $id;//返回ID
 	}
 
@@ -73,7 +73,7 @@ class Pool
 	static function pause($id,$s){
         $time = time()+$s;
         $driver = self::_driver();
-        $driver->setMark($time);
+        $driver->setMark($time,false);
 		return $driver->setStartingTime($id,$time);
 	}
 
@@ -91,12 +91,12 @@ class Pool
         return $r;
     }
 
-    static function setMark($time){
-        self::_driver()->setMark($time);
+    static function setMark($time,$compulsory=false){
+        return self::_driver()->setMark($time,$compulsory);
     }
 
     static function getMark(){
-        self::_driver()->getMark();
+        return intval(self::_driver()->getMark());
     }
 
     /**

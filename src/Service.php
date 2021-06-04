@@ -7,7 +7,7 @@ use Exception;
 use ir\cli\Cli;
 use ReflectionClass;
 
-class Daemon
+class Service
 {
     private $_timeout = 0;
     private $_enableTimeoutCtrl=false;
@@ -58,7 +58,20 @@ class Daemon
 
     private function _runItem(){
         $task = Pool::scan();
-        if($task){
+        if(empty($task)){
+            //无下一页
+            return false;
+        }
+        elseif (!isset($task['id']) || empty($task['id'])){
+            $this->_print("\n\n * Invalid TASK ID \n",'1;37',41); echo "\n";
+            print_r($task);
+        }
+        elseif(!isset($task['name']) || empty($task['name'])){
+            $this->_print("\n\n * Invalid TASK (ID:".$task['id'].") AND Auto Remove it",'1;37',41); echo "\n";
+            Pool::remove($task['id']);
+            return true;
+        }
+        else{
             $this->_printLn('EventMsg:// ID:'.$task['id'].' / event:'.$task['name'].' /args:' . json_encode($task['args']) );
 
             if(empty($this->_listeners)){
@@ -71,7 +84,7 @@ class Daemon
             $this->_printLn("\tListeners:".(empty($listeners)?'none':implode(',',array_keys($listeners))));
 
             $tracking = Pool::getRuntimeTracking($task['id']);//如果上次意外退出，接着上次继续运行
-            $progress = array_flip($listeners);//记录进度
+            $progress = $listeners; //记录进度
             $event = new Event($task['name'],$task['args']);
 
             //执行事件绑定的动作
@@ -114,8 +127,7 @@ class Daemon
             //有下一页
             return true;
         }
-        //无下一页
-        return false;
+
     }
 
     private function _getClsByFilePath($f){
@@ -193,7 +205,7 @@ class Daemon
      * 运行守护程序
      * @param $limitTime
      */
-    public function run($limitTime=-1){
+    public function daemon($limitTime=-1){
         $status = true;
         $this->_timeout = time()+$limitTime;
         $this->_enableTimeoutCtrl = ($limitTime>0);
@@ -202,7 +214,7 @@ class Daemon
         while ($status){
             $status = self::_runItem();
             if(!$status){
-                echo '无任务 ['.date('H:i:s')."] \r\n";
+                echo 'No task 无任务 ['.date('H:i:s')."] \r\n";
                 Pool::setMark(time()+60,true);//如果没有新的事件发生，将会在60秒后重试
                 while (1){
                     $mark = Pool::getMark();//避免数据库过载
@@ -210,7 +222,7 @@ class Daemon
                         sleep(1);
                         echo date('H:i:s')."\r";
                     }else{
-                        echo "发现新任务\r\n";
+                        echo "New Task 发现新任务\r\n";
                         $status = true;
                         break;
                     }
@@ -320,7 +332,7 @@ class Daemon
         }
         //elseif ($cmd==='....'){}//更多参数
         else {
-            $daemon->run();
+            $daemon->daemon();
             //echo "5秒后启动监听器守护程序，结束请按 < Ctrl + C >\n";
             //for ($i=5;$i>0;$i--){sleep(1);echo $i."\r"; }
 

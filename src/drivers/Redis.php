@@ -53,6 +53,8 @@ class Redis extends Driver
     public function remove($id)
     {
         $res = $this->_redis->zRem($this->_dataset, $id);
+        echo "================REM=========================\n";
+        var_export($res);
         return $res? true:false;
     }
 
@@ -94,11 +96,14 @@ class Redis extends Driver
     public function scan()
     {
         $record = $this->_redis->zRange($this->_dataset, 0, 1, true);
-        $time = current($record);
-        $text = key($record);
-        if($time<time()){
-            $res = json_decode($text,true);
-            if(is_array($res)){
+        if(!empty($record)) {
+            $time = current($record);
+            $text = key($record);
+            if ($time > time()) {
+                $this->setMark($time, true);//修复标记
+            } else {
+                $res = json_decode($text, true);
+                $res = is_array($res) ? $res : [];
                 $res['id'] = $text;
                 return $res;
             }
@@ -111,10 +116,15 @@ class Redis extends Driver
         return $this->_redis->get($this->_dataset.'__ir-e-mark');
     }
 
-    public function setMark($time){
-        $key = $this->_dataset.'__ir-e-mark';
-        $lastTime =  $this->_redis->get($key);
-        $this->_redis->set($key,min($time,intval($lastTime)));
+    public function setMark($time,$compulsory){
+        $key = $this->_dataset . '__ir-e-mark';
+        if($compulsory){
+            $this->_redis->set($key, $time);
+        }else {
+            $lastTime = $this->_redis->get($key);
+            $this->_redis->set($key, min($time, intval($lastTime)));
+        }
+        return true;
     }
 
     //========================重写消息广播过程跟踪========================
@@ -128,6 +138,7 @@ class Redis extends Driver
     public function setRuntimeTracking($id,$listener,$status){
         $key = 'ir-e'.md5($id);
         $r = $this->_redis->get($key);
+        if(!is_array($r))$r=[];
         $r[$listener] = $status;
         $this->_redis->set($key,serialize($r));
     }

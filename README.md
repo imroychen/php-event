@@ -1,8 +1,10 @@
-## 事件2.0
+## PHP-EVENT 2.0
+Docs: [中文简体](./README.md), [English](./README-EN.md)
 ## 安装和使用
+<a name="lang-zh-cn"></a>
 ### 1. 安装
-1. 传统装载：在你的公共代码中加入 require_once('php-event PATH/start.php');  [示例](./example/index.php)
-2. compser装载
+1. 传统装载：在你的公共代码中加入 require_once('php-event 路径/start.php');  [示例](./example/index.php)
+2. compser装载 
 ```json
     {
         "require-dev": {
@@ -12,7 +14,7 @@
             {
                 "name":"imroy/php-event",
                 "type":"git",
-                "url":"git@code.aliyun.com:imroy/php-event.git"
+                "url":"git@co...hp-event.git"
             }
         ]
     }
@@ -35,7 +37,7 @@ ir\e\App::setCfg([
 **event:** 请参考[./example/event/Event.php](./example/event/Event.php)<br><br>
 **store_driver:** 
     //该应用中内置了 Db （Sql DB），Sqlite，Redis，DbForLaravel ,DbForTp等驱动。<br>
-    内置驱动使用方法：'store_driver'=>'@DbForLaravel:event_store', 表示使用内置的驱动（DbForLaravel）参数(表)为event_store
+    内置驱动使用方法：'store_driver'=>'@DbForLaravel?table=event_store', 表示使用内置的驱动（DbForLaravel）参数(表)为event_store
     <br> 更多内置驱动请参考[./src/drivers/RADME.md](./src/drivers/RADME.md)
    <br> <br>
 **subscribers:**
@@ -85,7 +87,6 @@ complete 依赖 afterRequest    complete会自动等待afterRequest被所有监�
 afterRequest 依赖 beforeRequest    afterRequest会自动等待 beforeRequest 被所有监听者确认之后 才会真正广播出去。
 
 ### 4.事件的使用模式
-
 
 1. 事件订阅模式
 1. 事件绑定模式

@@ -60,7 +60,7 @@ abstract class Driver
 
     abstract function setStartingTime($id, $time);
 
-    protected function _createUniqId($data,$checkOriginalId){
+    protected function _createUniqId($data,$checkOriginalId=true){
         if($checkOriginalId && isset($data['id']) && !empty($data['id'])) {
             return $data['id'];
         }
@@ -76,7 +76,7 @@ abstract class Driver
     static private function _getMarkPath(){
         return App::cfg('temp_path') .DIRECTORY_SEPARATOR. 'event-queue-mark';
     }
-    function setMark($time,$compulsory=false){
+    function setMark($time,$compulsory){
         $f = self::_getMarkPath();
 
         if($compulsory){
