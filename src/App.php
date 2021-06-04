@@ -20,10 +20,9 @@ class App
     }
 
     /**
-     * @param $key
      * @return Config
      */
-    static public function cfg($key){
+    static public function cfg(){
         if(!is_object(self::$_cfgObj)){
             $cfgCls = self::$_cfgCls;
             self::$_cfgObj = new $cfgCls();
