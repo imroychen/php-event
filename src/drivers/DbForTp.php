@@ -29,8 +29,10 @@ class DbForTp extends Db
     {
         if($this->_model){
             return $this->_model->query($sql);
-        }else {
+        }elseif(class_exists('\think\Db')){
             return \think\Db::query($sql);
+        }else{
+            \think\facade\Db::query($sql);
         }
     }
 
@@ -38,8 +40,10 @@ class DbForTp extends Db
     {
         if($this->_model){
             $result = $this->_model->execute($sql);
-        }else {
+        }elseif(class_exists('\think\Db')){
             $result = \think\Db::execute($sql);
+        }else {
+            $result = \think\facade\Db::execute($sql);
         }
         return $result !=false;
     }

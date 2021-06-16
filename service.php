@@ -29,5 +29,6 @@ function start($script,$sleep){
 
 //您的脚本退出后 该服务会自动重启你的进程
 while (1){
-    start($script,1);exit;
+    start($script,1);
+    //exit;
 }

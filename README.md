@@ -76,7 +76,15 @@ Config接口请参考: [./src/Config.php](./src/Config.php)<br><br>
 返回类型："string",返回一个目录路径的，结尾不要加“/”。为空不记录日志  如：_/tmp/logs_<br><br>
 
 
-### 3. 触发事件
+### 3.启动事件服务
+参考 [example/daemon.php](example/daemon.php)
+```php
+//启动守护进程
+//$argv为所有的命令行参数 $_SERVER['argv']|| 如果是入口文件 也可使用$argv接收
+ir\e\Service::start($argv);
+```
+
+### 4. 触发事件
 
 #### 快捷使用方法
 ```php
