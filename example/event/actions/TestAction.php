@@ -14,7 +14,6 @@ class TestAction
 
     public function exec(){
         echo "[Exec:TestAction] test action ^.^ ^.^ ^.^\n";
-        //todo
         return true;
     }
 }

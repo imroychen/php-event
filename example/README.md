@@ -5,7 +5,8 @@
 +--- database       测试项目的存储仓库（数据库）
 +--- index.php      测试触发事件的代码 
 +--- daemon.php     守护进程（广播事件消息用的 请使用CLI启动） php daemon.php
-+--- event/ 
+                    以上为示例项目的基础代码 和事件代码无关
++--- event/ 事件相关的代码目录
     +--- Event.php      事件配置
     +--- Driver.php     消除暂存驱动  【可选】
     +--- Example.php    事件监听者及动作

@@ -31,7 +31,8 @@ class App
     }
 
     static public function getTempPath($file=''){
-        return self::cfg()->getTempPath().(empty($file)?'': (DIRECTORY_SEPARATOR.$file) );
+        $r =  self::cfg()->getTempPath().(empty($file)?'': (DIRECTORY_SEPARATOR.$file) );
+        return empty($r)?sys_get_temp_dir():$r;
     }
 
     /**

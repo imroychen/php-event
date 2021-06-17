@@ -56,7 +56,40 @@ class Service
         }
     }
 
+    private function _repairLastResult(){
+        $lastResult = file_get_contents($this->_trackingResultLog);
+        if($lastResult && trim($lastResult)!=''){
+            $_tmp = explode("\n",$lastResult);
+
+
+            $res = [];
+            foreach ($_tmp as $v){
+                list($id,$val)= explode("::",trim($v)."::");
+                if($id!='' && $val !='') {
+                    $res[$id][$val] = 1;
+                }
+            }
+
+            if(!empty($res)) {
+                foreach ($res as $lastId => $lastResult) {
+                    Pool::setResult($lastId, $lastResult);
+                }
+            }
+
+            file_put_contents($this->_trackingResultLog,'');
+        }
+    }
+
+    private function _resetLastResult(){
+        file_put_contents($this->_trackingResultLog,'');
+    }
+
+    private function _recordLastResult($id,$cls){
+        file_put_contents($this->_trackingResultLog , "\n".$id."::".$cls ,FILE_APPEND);
+    }
+
     private function _runItem(){
+        $this->_repairLastResult();
         $task = Pool::scan();
         if(empty($task)){
             //无下一页
@@ -83,7 +116,7 @@ class Service
             $listeners = (isset($this->_listeners[$nameLower])&& is_array($this->_listeners[$nameLower]))? $this->_listeners[$nameLower]: [];
             $this->_printLn("\tListeners:".(empty($listeners)?'none':implode(',',array_keys($listeners))));
 
-            $tracking = Pool::getRuntimeTracking($task['id']);//如果上次意外退出，接着上次继续运行
+            $tracking = $task['result'];//如果上次意外退出，接着上次继续运行
             $progress = $listeners; //记录进度
             $event = new Event($task['name'],$task['args']);
 
@@ -96,7 +129,8 @@ class Service
                     }else{
                         $r = (new $action($event))->exec();
                         if ($r || is_null($r)) {//null 没有返回值当成功处理
-                            Pool::setRuntimeTracking($task['id'],$action,1);//如果上次意外退出，接着上次继续运行
+                            //记录运行日志 如果上次意外退出，以便接着上次继续运行
+                            $this->_recordLastResult($task['id'],$action);
                         }
                     }
                 }
@@ -111,7 +145,8 @@ class Service
                 }else {
                     $listenerObj = new $cls($task['id'],$event);
                     if ($listenerObj->run()) {
-                        Pool::setRuntimeTracking($task['id'],$cls,1);//如果上次意外退出，接着上次继续运行
+                        //记录运行日志 如果上次意外退出，以便接着上次继续运行
+                        $this->_recordLastResult($task['id'],$cls);
                         unset($progress[$cls]);
                         $this->_print( "> ok");
                     } else {
@@ -122,6 +157,7 @@ class Service
 
             if(empty($progress)){
                 Pool::remove($task['id']);
+                $this->_resetLastResult();
             }
 
             //有下一页
@@ -213,19 +249,21 @@ class Service
             $status = self::_runItem();
             if(!$status){
                 echo 'No task 无任务 ['.date('H:i:s')."] \r\n";
-                Pool::setMark(time()+60,true);//如果没有新的事件发生，将会在60秒后重试
-                while (1){
+                Pool::setMark(time() + 60, true);//如果没有新的事件发生，将会在60秒后重试
+                while (1) {
                     $mark = Pool::getMark();//避免数据库过载
-                    if($mark>time()) {
+                    if ($mark > time()) {
                         sleep(1);
-                        echo date('H:i:s')."\r";
-                    }else{
+                        echo date('H:i:s') . "\r";
+                    } else {
                         echo "New Task 发现新任务\r\n";
                         $status = true;
                         break;
                     }
 
-                    if($this->_isTimeout()){break 2;}
+                    if ($this->_isTimeout()) {
+                        break 2;
+                    }
                 }
             }else{
                 if($this->_isTimeout()){$status = false;}

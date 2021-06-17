@@ -9,6 +9,7 @@ class ClassName extends \ir\e\Subscriber{
     //监听 AfterXxx事件
     protected function _onAfterXxx(){
             //$args = $this->_event->getArgs();
+            //$args = $this->_event->get('参数名');
     } 
 }
 ```

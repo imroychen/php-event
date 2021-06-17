@@ -39,6 +39,7 @@ class Pool
 	static function get($id){
 		$r = self::_driver()->get($id);
         $r['args'] = self::_dataDecode($r['args']);
+        $r['result'] = (isset($r['result']) && !empty($r['result']))? unserialize($r['result']):[];
         return $r;
 	}
 
@@ -50,7 +51,6 @@ class Pool
 
 	static function remove($id){
         $driver = self::_driver();
-        $driver->rmRuntimeTracking($id);
         return $driver->remove($id);
 	}
 
@@ -83,6 +83,10 @@ class Pool
 		return $driver->setStartingTime($id,$time);
 	}
 
+	static function setResult($id,$res){
+        self::_driver()->setResult($id,serialize($res));
+    }
+
     /**
      * 扫描可运行的任务
      * @return mixed
@@ -92,6 +96,7 @@ class Pool
         $r = self::_driver()->scan();
         if(!empty($r) && $r['id']) {
             $r['args'] = self::_dataDecode($r['args']);
+            $r['result'] = (isset($r['result']) && !empty($r['result']))? unserialize($r['result']):[];
             Pool::pause($r['id'], 20);
         }
         return $r;
@@ -103,18 +108,6 @@ class Pool
 
     static function getMark(){
         return intval(self::_driver()->getMark());
-    }
-
-    /**
-     * @param $id
-     * @return array
-     */
-    static function getRuntimeTracking($id){
-        return self::_driver()->getRuntimeTracking($id);
-    }
-
-    static function setRuntimeTracking($id,$val,$status=1){
-        return self::_driver()->setRuntimeTracking($id,$val,$status);
     }
 
 

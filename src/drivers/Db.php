@@ -4,12 +4,13 @@
 namespace ir\e\drivers;
 
 /**
+ * The driver cannot be used directly, please inherit and then implement the _query and _exec methods
+ * eg:\MyNameSpace\Mysql?table=ir_event_pool
  *
  * 该驱动不能直接使用，需要继承后自己去实现 _query和 _exec两个方法
  * 使用方法
- * 1.推荐 驱动Class名?table=tablename
+ * 1.驱动Class名?table=tablename
  * 如 \MyNameSpace\Mysql?table=ir_event_pool
- * 2.驱动Class名?tablename
  *
  *
  * @example
@@ -32,7 +33,7 @@ namespace ir\e\drivers;
  */
 
 /*
--- Mysql 表
+-- Mysql create table
  CREATE TABLE IF NOT EXISTS `ir_event_pool` (
   `id` varchar(32) NOT NULL,
   `name` varchar(100) NOT NULL,
@@ -199,12 +200,23 @@ abstract class Db extends Driver
     }
 
     /**
+     * 暂存结果
+     * @param $id
+     * @param $res
+     */
+    public function setResult($id,$res){
+        $id = var_export(strval($id),true);
+        $res = var_export(strval($res),true);
+        $this->_exec($this->_sql('update {{table}} set `result`='.$res.' where `id`='.$id ), 'update' );
+    }
+
+    /**
      * 扫描可运行的任务
      */
 
     public function scan()
     {
         $time = time();
-        return $this->_getRecord($this->_sql('select * from {{table}} where `starting_time`<'.$time.' order by `starting_time`'));
+        return  $this->_getRecord($this->_sql('select * from {{table}} where `starting_time`<'.$time.' order by `starting_time`'));
     }
 }

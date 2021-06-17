@@ -3,7 +3,7 @@
 
 namespace ir\e\drivers;
 
-use ir\e\App;
+use phpseclib3\Net\SFTP\Stream;
 
 /**
  * Redis 驱动
@@ -41,7 +41,15 @@ class Redis extends Driver
      */
     public function get($id)
     {
-        return json_decode($id,true);
+        $result =  json_decode($id,true);
+        $result['result'] = $this->_getResult($id);
+        return $result;
+    }
+
+    private function _getResult($id){
+        $resultKey = 'ir-e'.md5($id);
+        $result = $this->_redis->get($resultKey);
+        return  empty($r)? $result:null;
     }
 
     /**
@@ -88,6 +96,19 @@ class Redis extends Driver
     }
 
     /**
+     * @param string $id
+     * @param string $result
+     * @return bool
+     */
+
+    public function setResult($id, $result)
+    {
+        $key = 'ir-e'.md5($id);
+        $this->_redis->set($key,$result);
+        return true;
+    }
+
+    /**
      * 扫描可运行的任务
      */
 
@@ -103,6 +124,10 @@ class Redis extends Driver
                 $res = json_decode($text, true);
                 $res = is_array($res) ? $res : [];
                 $res['id'] = $text;
+
+                $res['result'] = $this->_getResult($text);
+
+
                 return $res;
             }
         }
@@ -125,24 +150,4 @@ class Redis extends Driver
         return true;
     }
 
-    //========================重写消息广播过程跟踪========================
-
-    public function getRuntimeTracking($id){
-        $key = 'ir-e'.md5($id);
-        $r = $this->_redis->get($key);
-        return empty($r)? unserialize($r):[];
-    }
-
-    public function setRuntimeTracking($id,$listener,$status){
-        $key = 'ir-e'.md5($id);
-        $r = $this->_redis->get($key);
-        if(!is_array($r))$r=[];
-        $r[$listener] = $status;
-        $this->_redis->set($key,serialize($r));
-    }
-
-    public function rmRuntimeTracking($id){
-        $key = 'ir-e'.md5($id);
-        $this->_redis->del($key);
-    }
 }

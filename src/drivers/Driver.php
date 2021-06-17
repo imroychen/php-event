@@ -42,7 +42,7 @@ abstract class Driver
      * @param array $data [
      *        'name'=>'',
      *        'dependency'=>'',
-     *      'starting_time'=0,
+     *        'starting_time'=0,
      *        'args'=>[]
      *    ];
      * @param $time 时间戳
@@ -60,6 +60,14 @@ abstract class Driver
 
     abstract function setStartingTime($id, $time);
 
+    abstract function setResult($id,$res);
+
+    /**
+     * 创建一个唯一ID
+     * @param $data
+     * @param bool $checkOriginalId
+     * @return string
+     */
     protected function _createUniqId($data,$checkOriginalId=true){
         if($checkOriginalId && isset($data['id']) && !empty($data['id'])) {
             return $data['id'];
@@ -97,34 +105,5 @@ abstract class Driver
         $f = App::getTempPath( 'ir-e_event-queue-mark');
         $content = file_get_contents($f);
         return intval($content);
-    }
-
-    //下面的方法 用于记录每个订阅者的收到消息的相应结果
-    //您可以重写该方法
-    /**
-     * 获取指定消息的 订阅确认情况
-     * @param string $id 事件ID
-     * @return array
-     */
-
-    function getRuntimeTracking($id){
-        $file = App::getTempPath( 'ir-e-t_'.md5($id));
-        if(file_exists($id)){
-            $text = file_get_contents($file);
-            $r = unserialize($text);
-            return  is_array($r)?$r:[];
-        }
-        return [];
-    }
-    
-    function setRuntimeTracking($id,$listener,$status){
-        $file = App::getTempPath( 'ir-e-t_'.md5($id));
-        $val = $this->get($id);
-        $val[$listener] = $status;
-        file_put_contents($file,serialize($val));
-    }
-    function rmRuntimeTracking($id){
-        $file = App::getTempPath( 'ir-e-t_'.md5($id));
-        unlink($file);
     }
 }

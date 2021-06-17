@@ -101,18 +101,15 @@ class File extends Driver
             $data['args'] = array_merge(['args' => []], $data);
             
             $dataStr = serialize($data);
-
-            $fIdx = $this->_file('@index');
-
-
             $f = $this->_file($id);
             $dir = dirname($f);
-
             if (!is_dir($dir)) {
                 mkdir($dir, 0777, true);
                 chmod($dir, 0777);
             }
             file_put_contents($f, $dataStr);
+
+            $fIdx = $this->_file('@index');
             if (strpos(file_get_contents($fIdx), $id) === false) {
                 file_put_contents($fIdx, "\n$id,$startTime|", FILE_APPEND);
             }
@@ -177,9 +174,16 @@ class File extends Driver
         }
         return false;
     }
-    
-    public function __destruct()
+
+
+    function setResult($id, $res)
     {
-        // TODO: Implement __destruct() method.
+        if($this->_exist($id)) {
+            $data = $this->get($id);
+            $data['result'] = $res;
+            $dataStr = serialize($data);
+            $f = $this->_file($id);
+            file_put_contents($f, $dataStr);
+        }
     }
 }

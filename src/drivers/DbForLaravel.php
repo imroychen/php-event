@@ -14,12 +14,19 @@ namespace ir\e\drivers;
 
 class DbForLaravel extends Db
 {
+    /**
+     * @inheritDoc
+     */
 
     protected function _query($sql)
     {
         $results = \Illuminate\Support\Facades\DB::select($sql);
         return $this->_itemToArray($results);
     }
+
+    /**
+     * @inheritDoc
+     */
 
     protected function _exec($sql,$sqlType)
     {
