@@ -51,7 +51,10 @@ class App
             $eventInfo  = method_exists($cls,$event)?$cls::$event():[];
             if(isset($eventInfo['exec']) && count($eventInfo['exec'])>0){
                 foreach ($eventInfo['exec'] as $cls){
-                    new $cls();
+                    $_tmp = new $cls();
+                    if(method_exists($_tmp,'exec')){
+                        $_tmp->exec();
+                    }
                 }
             }
 

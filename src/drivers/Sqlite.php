@@ -1,6 +1,7 @@
 <?php
 namespace ir\e\drivers;
 
+use ir\e\App;
 use ir\e\drivers;
 
 /**
@@ -46,12 +47,52 @@ class Sqlite extends drivers\Db
         return $this->_db->exec($sql);
     }
 
+    //异步写入,弥补高并发写入锁死的缺陷
+    public function create($data,$time){
+        $data['starting_time'] = $time;
+        $data['id'] = $this->_createUniqId($data);
+        $f = App::getTempPath('ir-e-sqlite-create-task');
+
+        $fCnt = file_get_contents($f);
+        file_put_contents($fCnt,serialize($data),FILE_APPEND);
+        return $data['id'];
+    }
+    private function _asyncCreate($fCnt){
+        $cnt = file_get_contents($fCnt);
+        $list = explode("\n",$cnt);
+        foreach ($list as $_item) {
+            $_item = trim($_item);
+            $data = unserialize($_item);
+            if (!empty($data)) {
+                $id = $data['id'];
+                $exist = $this->_exist($id);
+
+                if (!$this->_exist($id)) {
+
+                    $values = '';
+                    $fields = '';
+                    foreach ($data as $f => $v) {
+                        $fields[] = '`' . $f . '`';
+                        $values[] = var_export($v, true);
+                    }
+                    $fieldsStr = implode(',', $fields);
+                    $valuesStr = implode(',', $values);
+                    $res = $this->_exec('insert into '.$this->_table.' (' . $fieldsStr . ') values (' . $valuesStr . ')', 'insert');
+                    return $res ? $id : false;
+
+                }
+            }
+        }
+    }
+
 
     public function scan()
     {
         //$this->_asyncCreate();
         return parent::scan();
     }
+
+
 }
 
 

@@ -179,7 +179,7 @@ abstract class Db extends Driver
      * @return bool|string false|id
      */
 
-    private function _exist($id)
+    protected function _exist($id)
     {
         $id = var_export(strval($id),true);
         $_res = $this->_getRecord($this->_sql('select `id` from {{table}} where `id`='.$id));
