@@ -1,4 +1,7 @@
 <?php
+if(substr(PHP_SAPI_NAME(),0,3) !== 'cli'){
+    exit("请在CLI下运行 / The program runs only in CLI mode!");
+}
 //================================================================
 //设置当前示例项目的(MyNamespace)加载目录
 //------------------------------
@@ -15,16 +18,6 @@ spl_autoload_register(function ($class) {
 require (dirname(__DIR__)).'/start.php';
 //加载事件模块的配置
 ir\e\App::setCfg('\\MyNamespace\\event\\Config');
-
-
-
-
-
-
-if(substr(PHP_SAPI_NAME(),0,3) !== 'cli'){
-    exit("请在CLI下运行 / The program runs only in CLI mode!");
-}
-
 //-------------------------
 //启动守护进程
 ir\e\Service::start($argv);

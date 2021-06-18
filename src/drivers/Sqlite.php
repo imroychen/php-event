@@ -86,8 +86,7 @@ class Sqlite extends drivers\Db
     }
 
 
-    public function scan()
-    {
+    public function scan(){
         //$this->_asyncCreate();
         return parent::scan();
     }
