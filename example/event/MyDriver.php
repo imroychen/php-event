@@ -11,6 +11,11 @@ use ir\e\drivers;
 class MyDriver extends drivers\Db
 {
     private $_db;
+
+    /**
+     * @param array $args 参考Config::getPoolDriver
+     * @param string $rawArgs 参考Config::getPoolDriver
+     */
     protected function _init($args, $rawArgs)
     {
         //database=/21andy.com/21andy.sqlite

@@ -1,4 +1,5 @@
 <?php
+//php vendor/imroy/php-event/service.php 你的服务脚本
 if(substr(PHP_SAPI_NAME(),0,3) !== 'cli'){
     exit("请在CLI下运行 / The program runs only in CLI mode!");
 }

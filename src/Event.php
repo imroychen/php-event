@@ -100,16 +100,4 @@ class Event
     }
 
     public function getAll(){return $this->_args;}
-
-    /**
-     * @param string $event
-     * @param array $args
-     * @param int $delay 异步延时
-     * @param int $dependency 事件依赖
-     * @return int
-     */
-
-    static public function fire($event,$args,$delay=3,$dependency=0){
-        return App::fire($event,$args,$delay,$dependency);
-    }
 }

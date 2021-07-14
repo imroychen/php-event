@@ -17,6 +17,7 @@ class Config implements \ir\e\Config
     }
 
     /**
+     *
      * @inheritDoc
      */
     public function getSubscribers()

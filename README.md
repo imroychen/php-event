@@ -51,7 +51,7 @@ Config接口请参考: [./src/Config.php](./src/Config.php)<br><br>
 
 该应用中内置了 Db （Sql DB），Sqlite，Redis，DbForLaravel ,DbForTp等驱动。<br>
 内置驱动使用方法：'store_driver'=>'@DbForLaravel?table=event_store', 表示使用内置的驱动（DbForLaravel）参数(表)为event_store
-<br> 更多内置驱动请参考[./src/drivers/RADME.md](./src/drivers/RADME.md)
+<br> 更多内置驱动请参考[./src/drivers/RADME.md](./src/drivers/README.md)
 
 **public function getSubscribers()**
 
@@ -88,12 +88,12 @@ ir\e\Service::start($argv);
 
 #### 快捷使用方法
 ```php
-use ir\e\Event; //引用类
+use ir\e\Fire; //引用类
 
-Event::fire('事件名',['参数1','更多参数...'],'延时广播 秒','依赖事件ID');
-Event::fire('complete',[]);//常用方法
-Event::fire('complete',[],10);//延时用法，10秒后广播事件消息
-Event::fire('complete',[],0,5000);//5000 广播确认完之后才会广播当前事件
+Fire::event('事件名',['参数1','更多参数...'],'延时广播 秒','依赖事件ID');
+Fire::event('complete',[]);//常用方法
+Fire::event('complete',[],10);//延时用法，10秒后广播事件消息
+Fire::event('complete',[],0,5000);//消息ID为5000的广播确认完之后才会广播当前事件
 ```
 #### 对象使用方法
 会自动形成一条事件依赖链，用于保证事件成功广播出去的顺序

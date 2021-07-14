@@ -8,5 +8,8 @@ class ScriptName{
     public function __construct($event) {
         //todo
     }
+    public function exec(){
+        //todo
+    }
 }
 ```
