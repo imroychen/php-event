@@ -3,44 +3,40 @@ Docs: [中文简体](./README.md), [English](./README-EN.md)
 ## 安装和使用
 <a name="lang-zh-cn"></a>
 ### 1. 安装
-1. 传统装载：在你的公共代码中加入 require_once('php-event 路径/start.php');  [示例](./example/index.php)
-2. compser装载 
-```json
-    {
-        "require-dev": {
-                "imroy/php-event":"dev-master"
-        },
-        "repositories":[
-            {
-                "name":"imroy/php-event",
-                "type":"git",
-                "url":"git@co...hp-event.git"
-            }
-        ]
-    }
-```
-
-```SHELL
+①.使用compser装载 
+```shell script
+composer require iry/cli
 compoer update
 ```
 
+②.传统/手动装载：在你的公共代码中加入如下代码   [示例](./example/index.php)
+```php
+require_once('... php-event 路径/start.php');
+```
+
+
+
 ### 2. 配置设置
 在公共文件*`(单入口文件的项目建议在入口文件 )`*中加入如下代码. [示例](./example/index.php)
+
 ```php
 // MyNamespace\event\Config为示例名称请修改自己的Class名称
-ir\e\App::setCfg('\\MyNamespace\\event\\Config');//参数为 Class带命名空间的全名称
+iry\e\App::setCfg('\\MyNamespace\\event\\Config');//参数为 Class带命名空间的全名称
+
+//iry\e\App::setCfg(\MyNamespace\event\Config::class);//如果php版本>= 5.5 也可以这样
 ```
 
 ### 3. 创建 Class \\MyNamespace\event\\Config
-```
-namespace \\MyNamespace\event;
-class Config implements \ir\e\Config{
-   public function getPoolDriver()
+```php
+<?php
+namespace \MyNamespace\event;
+class Config implements \iry\e\Config{
+   public function getPoolDriver(){}
    public function getSubscribers(){}
-   public function getEventRules(){}
-   public function getActionNs(){}
-   public function getTempPath(){}
-   public function getLogPath(){}
+   public function getEventRules(){return 'className';}
+   public function getActionNs(){return __NAMESPACE__.'\\action';}
+   public function getTempPath(){return sys_get_temp_dir();}
+   public function getLogPath(){return false;}
 
 }
 ```
@@ -81,14 +77,14 @@ Config接口请参考: [./src/Config.php](./src/Config.php)<br><br>
 ```php
 //启动守护进程
 //$argv为所有的命令行参数 $_SERVER['argv']|| 如果是入口文件 也可使用$argv接收
-ir\e\Service::start($argv);
+iry\e\Service::start($argv);
 ```
 
 ### 4. 触发事件
 
 #### 快捷使用方法
 ```php
-use ir\e\Fire; //引用类
+use iry\e\Fire; //引用类
 
 Fire::event('事件名',['参数1','更多参数...'],'延时广播 秒','依赖事件ID');
 Fire::event('complete',[]);//常用方法
@@ -98,7 +94,7 @@ Fire::event('complete',[],0,5000);//消息ID为5000的广播确认完之后才�
 #### 对象使用方法
 会自动形成一条事件依赖链，用于保证事件成功广播出去的顺序
 ```php
-use ir\e\Fire; //引用类
+use iry\e\Fire; //引用类
 
 $fire = new Fire();
 $fire ->start('beforeRequest',['参数1','...']);

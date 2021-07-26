@@ -1,12 +1,12 @@
 <?php
 
 
-namespace ir\e\drivers;
+namespace iry\e\drivers;
 
 /**
  * File 驱动
  * File?path=/your/path
- * @package ir\e\drivers
+ * @package iry\e\drivers
  * @example new File('path=...')
  */
 class File extends Driver

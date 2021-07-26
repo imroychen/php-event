@@ -17,7 +17,7 @@ spl_autoload_register(function ($class) {
 //------------------------------
 require (dirname(__DIR__)).'/start.php';
 //加载事件模块的配置
-ir\e\App::setCfg('\\MyNamespace\\event\\Config');
+iry\e\App::setCfg('\\MyNamespace\\event\\Config');
 //-------------------------
 //启动守护进程
-ir\e\Service::start($argv);
+iry\e\Service::start($argv);

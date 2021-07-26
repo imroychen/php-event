@@ -1,14 +1,14 @@
 <?php
 
 
-namespace ir\e\drivers;
+namespace iry\e\drivers;
 
 use phpseclib3\Net\SFTP\Stream;
 
 /**
  * Redis 驱动
  * @Redis?host=localhost&port=6379&key=ir-e-store&password=123
- * @package ir\e\drivers
+ * @package iry\e\drivers
  */
 class Redis extends Driver
 {

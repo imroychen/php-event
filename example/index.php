@@ -17,7 +17,7 @@ spl_autoload_register(function ($class) {
 //---------------------------------------------------------------
 require (dirname(__DIR__)).'/start.php';
 //加载事件模块的配置
-ir\e\App::setCfg('\\MyNamespace\\event\\Config');
+iry\e\App::setCfg('\\MyNamespace\\event\\Config');
 
 
 
@@ -28,7 +28,7 @@ $param = uniqid();
 for ($i = 0;$i<10;$i++){
     echo "Fire the \"Test\" \n";
     //触发一个test事件.
-    ir\e\Event::fire('test',['test'=>$param.' '.date('H:i:s')],0);
+    iry\e\Event::fire('test',['test'=>$param.' '.date('H:i:s')],0);
     sleep(mt_rand(0,4));
 }
 

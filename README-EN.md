@@ -2,38 +2,23 @@ Docs: [中文简体](./README.md), [English](./README-EN.md)
 ## How to install and use
 <a id="lang-en"></a>
 ## 1.installation
-1. Traditional loading: add require_once('php-event PATH/start.php'); to your public file [example](./example/index.php)
+1. Install using composer. 
 
-2. Install using composer. 
-
-```json
-    {
-        "require-dev": {
-                "imroy/php-event":"dev-master"
-        },
-        "repositories":[
-            {
-                "name":"imroy/php-event",
-                "type":"git",
-                "url":"git@co...hp-event.git"
-            }
-        ]
-    }
-```
-
-```SHELL
+```shell script
+composer require iry/cli
 compoer update
 ```
+2.Traditional loading: add require_once('php-event PATH/start.php'); to your public file [example](./example/index.php)
 
 # Add configuration
 ```php
-ir\e\App::setCfg('\\MyNamespace\\event\\Config');
+iry\e\App::setCfg('\\MyNamespace\\event\\Config');
 ```
 
 ### 3. Create class \\MyNamespace\event\\Config
 ```
 namespace \\MyNamespace\event;
-class Config implements \ir\e\Config{
+class Config implements \iry\e\Config{
    public function getPoolDriver()
    public function getSubscribers(){}
    public function getEventRules(){}
@@ -80,7 +65,7 @@ return："string",Return a directory path, do not add "/" at the end。 Example�
 
 #### Quick way
 ```php
-use ir\e\Event;
+use iry\e\Event;
 
 Event::fire('Event Name',['argument 1','argument 2...'],'Delay broadcast for n seconds','Dependent event ID');
 Event::fire('complete',[]);
@@ -90,7 +75,7 @@ Event::fire('complete',[],0,5000);//5000 The current event will not be broadcast
 #### Use event objects
 An event dependency chain will be automatically formed to ensure the sequence of events being broadcast successfully
 ```php
-use ir\e\Fire; 
+use iry\e\Fire; 
 
 $fire = new Fire();
 $fire ->start('beforeRequest',['arguments1','...']);

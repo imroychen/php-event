@@ -13,7 +13,7 @@
 # 基于DB内置驱动来自定义
 使用数据库存储 可以基于 DB内置驱动 自定义驱动
 ```php
-class DbForTp extends \ir\e\drivers\Db
+class DbForTp extends \iry\e\drivers\Db
 {
     /**
      * @inheritDoc
@@ -31,7 +31,7 @@ class DbForTp extends \ir\e\drivers\Db
 # 自定义驱动
 只要自己定义个Class 代码如下，代码可以放在你的项目的任何地方。只要符合你的项目的自动加载规范
 ```php
-class MyDriver extends \ir\e\drivers\Driver{
+class MyDriver extends \iry\e\drivers\Driver{
         /**
          * @param array $args 编码后的参数 如:['host'=>'',....]
          * @param $rawArgs 原始的参数 如:host=127.0.0.1;port=....

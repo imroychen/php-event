@@ -1,7 +1,7 @@
 <?php
 
 
-namespace ir\e\drivers;
+namespace iry\e\drivers;
 
 /*
  * Laravel *下使用数据为存储仓库

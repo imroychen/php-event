@@ -1,7 +1,7 @@
 <?php
 
 
-namespace ir\e;
+namespace iry\e;
 
 
 interface Config

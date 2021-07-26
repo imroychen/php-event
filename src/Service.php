@@ -1,10 +1,10 @@
 <?php
 
 
-namespace ir\e;
+namespace iry\e;
 
 use Exception;
-use ir\cli\Cli;
+use iry\cli\Cli;
 use ReflectionClass;
 
 class Service

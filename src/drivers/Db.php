@@ -1,7 +1,7 @@
 <?php
 
 
-namespace ir\e\drivers;
+namespace iry\e\drivers;
 
 /**
  * The driver cannot be used directly, please inherit and then implement the _query and _exec methods
@@ -16,7 +16,7 @@ namespace ir\e\drivers;
  * @example
   ```php
     namespace MyNameSpace;
-    class MyDriver extend ir\e\drivers\Db{
+    class MyDriver extend iry\e\drivers\Db{
        protected function _query(){
             //todo
            return [ ['field'=>'value', 'more fields...'], 'more records....']
@@ -29,7 +29,7 @@ namespace ir\e\drivers;
   }
   ```
  *
- * @package ir\e\drivers
+ * @package iry\e\drivers
  */
 
 /*

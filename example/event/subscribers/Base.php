@@ -4,7 +4,7 @@
 namespace MyNamespace\event\subscribers;
 
 
-use ir\e;
+use iry\e;
 
     /**
      * 这个是一个示例 请勿删除

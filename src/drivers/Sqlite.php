@@ -1,13 +1,13 @@
 <?php
-namespace ir\e\drivers;
+namespace iry\e\drivers;
 
-use ir\e\App;
-use ir\e\drivers;
+use iry\e\App;
+use iry\e\drivers;
 
 /**
  * Class Sqlite
  * 使用方式 @Sqlite?dsn=PDO DSN&table=Table Name
- * @package ir\e\drivers
+ * @package iry\e\drivers
  */
 
 class Sqlite extends drivers\Db

@@ -5,7 +5,7 @@
  * Time: 20:41
  */
 
-namespace ir\e;
+namespace iry\e;
 
 class Event
 {

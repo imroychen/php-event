@@ -1,9 +1,9 @@
 <?php
-namespace ir\e;
+namespace iry\e;
 
 /**
  * Class Pool
- * @package ir\e
+ * @package iry\e
  */
 class Pool
 {

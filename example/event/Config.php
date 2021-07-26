@@ -4,7 +4,7 @@
 namespace MyNamespace\event;
 
 
-class Config implements \ir\e\Config
+class Config implements \iry\e\Config
 {
 
     /**

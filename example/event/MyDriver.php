@@ -1,7 +1,7 @@
 <?php
 namespace MyNamespace\event;
 
-use ir\e\drivers;
+use iry\e\drivers;
 
 /**
  * Class MyDriver

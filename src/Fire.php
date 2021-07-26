@@ -1,10 +1,10 @@
 <?php
 
 
-namespace ir\e;
+namespace iry\e;
 /**
  * Class Fire
- * @package ir\e
+ * @package iry\e
  *
  * @example ./README.md *
  */

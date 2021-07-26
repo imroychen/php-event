@@ -3,7 +3,7 @@
 ```php
 namespace MyNamespace;
 
-class ClassName extends \ir\e\Subscriber{
+class ClassName extends \iry\e\Subscriber{
     
     //Listen AfterXxx 
     //监听 AfterXxx事件
