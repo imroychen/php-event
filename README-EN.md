@@ -2,13 +2,14 @@ Docs: [中文简体](./README.md), [English](./README-EN.md)
 ## How to install and use
 <a id="lang-en"></a>
 ## 1.installation
-1. Install using composer. 
+1). Install using composer. 
 
 ```shell script
 composer require iry/cli
 compoer update
 ```
-2.Traditional loading: add require_once('php-event PATH/start.php'); to your public file [example](./example/index.php)
+
+2).Traditional loading: add require_once('php-event PATH/start.php'); to your public file [example](./example/index.php)
 
 # Add configuration
 ```php
