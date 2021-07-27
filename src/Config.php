@@ -47,24 +47,6 @@ interface Config
 
     public function getTempPath();//eg: return sys_get_temp_dir()
 
-    /**
-     * Namespace for event actions
-     * 事件绑定动作的公共命名空间
-     *
-     * @return bool|string 
-     */
-
-    public function getActionNs();
-
-    /**
-     * Log directory。Return false: do not record any logs
-     * 日志目录 返回false 不记录任何日志
-     *
-     * @return string|bool path/false
-     */
-
-    public function getLogPath();
-
 
     /**
      * The name of the event rule

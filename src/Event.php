@@ -44,13 +44,9 @@ class Event
 
         if(!empty($eventCfgCls) && method_exists($eventCfgCls,$this->_eventName)) {
             $this->_eventConfig = call_user_func([$eventCfgCls, $this->_eventName]);
-            $actionNs =  App::cfg()->getActionNs();
             if(!empty($this->_eventConfig['actions'])) {
                 foreach ($this->_eventConfig['actions'] as $key=>$cls) {
-                    //auto append ns
-                    if (strstr($cls,'\\')===false) {
-                        $this->_eventConfig['actions'][$key] = $actionNs .'\\'. $cls;
-                    }
+                    $this->_eventConfig['actions'][$key] = $cls;
                 }
             }
         }

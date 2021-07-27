@@ -24,9 +24,7 @@ class Config implements \iry\e\Config{
    public function getPoolDriver()
    public function getSubscribers(){}
    public function getEventRules(){}
-   public function getActionNs(){}
    public function getTempPath(){}
-   public function getLogPath(){}
 
 }
 ```
@@ -50,15 +48,9 @@ return array（recommended）|string<br>
 
 return ："string", Class Name，Example[./example/event/Event.php](./example/event/Event.php)<br><br>
 
-**public function getActionNs()**
-
 return："string"
 
 **public function getTempPath()**
-
-return："string",Return a directory path, do not add "/" at the end。 Example：_/tmp_<br><br>
-
-**public function getLogPath()**
 
 return："string",Return a directory path, do not add "/" at the end。 Example：_/tmp_<br><br>
 

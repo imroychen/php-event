@@ -39,9 +39,7 @@ class Config implements \iry\e\Config{
    public function getPoolDriver(){}
    public function getSubscribers(){}
    public function getEventRules(){return 'className';}
-   public function getActionNs(){return __NAMESPACE__.'\\action';}
    public function getTempPath(){return sys_get_temp_dir();}
-   public function getLogPath(){return false;}
 
 }
 ```
@@ -64,17 +62,12 @@ Config接口请参考: [./src/Config.php](./src/Config.php)<br><br>
 
 返回类型："string", 返回一个 事件规则的Class名称，请参考[./example/event/Event.php](./example/event/Event.php)<br><br>
 
-**public function getActionNs()**
 
 返回类型："string"
 
 **public function getTempPath()**
 
 返回类型："string",返回一个目录路径的，结尾不要加“/”。 如：_/tmp_<br><br>
-
-**public function getLogPath()**
-
-返回类型："string",返回一个目录路径的，结尾不要加“/”。为空不记录日志  如：_/tmp/logs_<br><br>
 
 
 ### 3.启动事件服务
