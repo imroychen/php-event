@@ -46,7 +46,7 @@ class Event
             $this->_eventConfig = call_user_func([$eventCfgCls, $this->_eventName]);
             if(!empty($this->_eventConfig['actions'])) {
                 foreach ($this->_eventConfig['actions'] as $key=>$cls) {
-                    $this->_eventConfig['actions'][$key] = $cls;
+                    $this->_eventConfig['actions'][$key] = str_replace('.','\\',$cls);
                 }
             }
         }
