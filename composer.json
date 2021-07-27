@@ -2,7 +2,6 @@
 	"name": "iry/php-event",
 	"description": "A simple php event engine to reduce the coupling between project modules.(一个简单php事件引擎，以便解耦项目中的各模块)",
 	"type": "library",
-	"version": "1.0.0",
 	"license": "MIT",
 	"authors": [
 		{
