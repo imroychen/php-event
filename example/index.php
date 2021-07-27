@@ -28,7 +28,7 @@ $param = uniqid();
 for ($i = 0;$i<10;$i++){
     echo "Fire the \"Test\" \n";
     //触发一个test事件.
-    iry\e\Event::fire('test',['test'=>$param.' '.date('H:i:s')],0);
+    iry\e\Fire::event('test',['test'=>$param.' '.date('H:i:s')],0);
     sleep(mt_rand(0,4));
 }
 
