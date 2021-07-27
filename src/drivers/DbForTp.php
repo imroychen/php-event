@@ -4,7 +4,7 @@
 namespace iry\e\drivers;
 
 /*
- * Laravel *下使用数据为存储仓库
+ * Tp *下使用数据为存储仓库
  *
  * 使用方法
  * @DbForTp?table=tableName
@@ -28,11 +28,11 @@ class DbForTp extends Db
     protected function _query($sql)
     {
         if($this->_model){
-            return $this->_model->query($sql);
+            return $this->_model->query($sql);//TP V1.*-V3.*
         }elseif(class_exists('\think\Db')){
-            return \think\Db::query($sql);
+            return \think\Db::query($sql); //TP V5.0.*
         }else{
-            \think\facade\Db::query($sql);
+            \think\facade\Db::query($sql); //TP >= V5.1
         }
     }
 

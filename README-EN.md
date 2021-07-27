@@ -12,6 +12,7 @@ compoer update
 2).Traditional loading: add require_once('php-event PATH/start.php'); to your public file [example](./example/index.php)
 
 # Add configuration
+
 ```php
 iry\e\App::setCfg('\\MyNamespace\\event\\Config');
 ```

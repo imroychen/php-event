@@ -2,14 +2,19 @@
 Docs: [中文简体](./README.md), [English](./README-EN.md)
 ## 安装和使用
 <a name="lang-zh-cn"></a>
+
 ### 1. 安装
+
 ①.使用compser装载 
+
+
 ```shell script
 composer require iry/cli
 compoer update
 ```
 
 ②.传统/手动装载：在你的公共代码中加入如下代码   [示例](./example/index.php)
+
 ```php
 require_once('... php-event 路径/start.php');
 ```
