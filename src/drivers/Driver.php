@@ -4,11 +4,13 @@ use iry\e\App;
 
 abstract class Driver
 {
+    private $_markFile;
     /**
      * Driver constructor.
      * @param $rawArgs
      */
     function __construct($rawArgs){
+        $this->_markFile = App::getTempPath( 'ir-e_event-queue-mark');
         $_argsArr = explode('&',$rawArgs);
         $args = [];
         if(count($_argsArr)>0) {
@@ -84,7 +86,7 @@ abstract class Driver
      * @return string
      */
     function setMark($time,$compulsory){
-        $f = App::getTempPath( 'ir-e_event-queue-mark');
+        $f = $this->_markFile;
 
         if($compulsory){
             file_put_contents($f, $time);
@@ -102,7 +104,7 @@ abstract class Driver
     }
 
     function getMark(){
-        $f = App::getTempPath( 'ir-e_event-queue-mark');
+        $f = $this->_markFile;
         $content = file_get_contents($f);
         return intval($content);
     }

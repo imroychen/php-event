@@ -47,17 +47,21 @@ class Sqlite extends drivers\Db
         return $this->_db->exec($sql);
     }
 
-    //异步写入,弥补高并发写入锁死的缺陷
+    //异步写入,弥补Sqlite并发写入慢及锁死的缺陷
     public function create($data,$time){
         $data['starting_time'] = $time;
         $data['id'] = $this->_createUniqId($data);
-        $f = App::getTempPath('ir-e-sqlite-create-task');
 
-        $fCnt = file_get_contents($f);
+        $fCnt = $this->_getQueueName();
         file_put_contents($fCnt,serialize($data),FILE_APPEND);
         return $data['id'];
     }
     private function _asyncCreate($fCnt){
+        if(!file_exists($fCnt)){ return false;}
+
+        $f = App::getTempPath('ir-e-sqlite-create-task');
+        file_put_contents($f, App::getTempPath(uniqid()));
+
         $cnt = file_get_contents($fCnt);
         $list = explode("\n",$cnt);
         foreach ($list as $_item) {
@@ -65,7 +69,6 @@ class Sqlite extends drivers\Db
             $data = unserialize($_item);
             if (!empty($data)) {
                 $id = $data['id'];
-                $exist = $this->_exist($id);
 
                 if (!$this->_exist($id)) {
 
@@ -78,16 +81,27 @@ class Sqlite extends drivers\Db
                     $fieldsStr = implode(',', $fields);
                     $valuesStr = implode(',', $values);
                     $res = $this->_exec('insert into '.$this->_table.' (' . $fieldsStr . ') values (' . $valuesStr . ')', 'insert');
-                    return $res ? $id : false;
-
                 }
             }
         }
+        unlink($fCnt);
+        return true;
+    }
+
+    private function _getQueueName(){
+        $f = App::getTempPath('ir-e-sqlite-create-task');
+        $fCnt = file_get_contents($f);
+        if(!$fCnt) {
+            $fCnt = App::getTempPath(uniqid());
+            file_put_contents($f, $fCnt);
+        }
+        return $fCnt;
     }
 
 
     public function scan(){
-        //$this->_asyncCreate();
+        $queueName = $this->_getQueueName();
+        $this->_asyncCreate($queueName);
         return parent::scan();
     }
 

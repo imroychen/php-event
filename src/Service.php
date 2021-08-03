@@ -14,8 +14,11 @@ class Service
     private $_listeners = [];
 
     private $_colorStyle = true;
+
+    private $_trackingResultLog = '';
     public function __construct($options = [])
     {
+        $this->_trackingResultLog = App::getTempPath('iry-event-mark');
         if(!empty($options)){
             $this->_colorStyle = (isset($options['--color']) && strtolower($options['--color'])==='n')?false:true;
             if($this->_colorStyle && strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
@@ -57,26 +60,29 @@ class Service
     }
 
     private function _repairLastResult(){
-        $lastResult = file_get_contents($this->_trackingResultLog);
-        if($lastResult && trim($lastResult)!=''){
-            $_tmp = explode("\n",$lastResult);
+        $logFile = $this->_trackingResultLog;
+        if(file_exists($logFile)) {
+            $lastResult = file_get_contents($logFile);
+            if ($lastResult && trim($lastResult) != '') {
+                $_tmp = explode("\n", $lastResult);
 
 
-            $res = [];
-            foreach ($_tmp as $v){
-                list($id,$val)= explode("::",trim($v)."::");
-                if($id!='' && $val !='') {
-                    $res[$id][$val] = 1;
+                $res = [];
+                foreach ($_tmp as $v) {
+                    list($id, $val) = explode("::", trim($v) . "::");
+                    if ($id != '' && $val != '') {
+                        $res[$id][$val] = 1;
+                    }
                 }
-            }
 
-            if(!empty($res)) {
-                foreach ($res as $lastId => $lastResult) {
-                    Pool::setResult($lastId, $lastResult);
+                if (!empty($res)) {
+                    foreach ($res as $lastId => $lastResult) {
+                        Pool::setResult($lastId, $lastResult);
+                    }
                 }
-            }
 
-            file_put_contents($this->_trackingResultLog,'');
+                file_put_contents($logFile, '');
+            }
         }
     }
 
@@ -89,7 +95,6 @@ class Service
     }
 
     private function _runItem(){
-        $this->_repairLastResult();
         $task = Pool::scan();
         if(empty($task)){
             //无下一页
@@ -244,6 +249,8 @@ class Service
         $this->_timeout = time()+$limitTime;
         $this->_enableTimeoutCtrl = ($limitTime>0);
         //$this->_listeners = $this->_getListeners();放在首次有任务的时候计算
+
+        $this->_repairLastResult();//如果上次意外退出 尝试修复上次意外退出的的结果
 
         while ($status){
             $status = self::_runItem();
