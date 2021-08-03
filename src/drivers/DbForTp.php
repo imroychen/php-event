@@ -14,6 +14,7 @@ class DbForTp extends Db
 {
 
     private $_model = false;
+    private $_dbCls = '';
     protected function _init($args, $rawArgs)
     {
         parent::_init($args, $rawArgs);
@@ -23,16 +24,23 @@ class DbForTp extends Db
                 $this->_model = m($this->_table);
             }
         }
+
+        if(!$this->_model){
+            if(class_exists('\think\Db')){
+                $this->_dbCls = '\\think\\Db'; //TP V5.0.*
+            }else {
+                $this->_dbCls = '\\think\\facade\\Db'; //TP >= V5.1
+            }
+        }
     }
 
     protected function _query($sql)
     {
         if($this->_model){
             return $this->_model->query($sql);//TP V1.*-V3.*
-        }elseif(class_exists('\think\Db')){
-            return \think\Db::query($sql); //TP V5.0.*
         }else{
-            \think\facade\Db::query($sql); //TP >= V5.1
+            $dbCls = $this->_dbCls;
+            $dbCls::query($sql);
         }
     }
 
@@ -40,10 +48,9 @@ class DbForTp extends Db
     {
         if($this->_model){
             $result = $this->_model->execute($sql);
-        }elseif(class_exists('\think\Db')){
-            $result = \think\Db::execute($sql);
         }else {
-            $result = \think\facade\Db::execute($sql);
+            $dbCls = $this->_dbCls;
+            $result = $dbCls::execute($sql);
         }
         return $result !=false;
     }
