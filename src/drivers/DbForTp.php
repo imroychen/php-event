@@ -26,7 +26,7 @@ class DbForTp extends Db
         }
 
         if(!$this->_model){
-            if(class_exists('\think\Db')){
+            if(class_exists('\\think\\Db')){
                 $this->_dbCls = '\\think\\Db'; //TP V5.0.*
             }else {
                 $this->_dbCls = '\\think\\facade\\Db'; //TP >= V5.1
