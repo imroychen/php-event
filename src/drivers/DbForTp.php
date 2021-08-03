@@ -17,7 +17,7 @@ class DbForTp extends Db
     protected function _init($args, $rawArgs)
     {
         parent::_init($args, $rawArgs);
-        if(defined(THINK_VERSION)){
+        if(defined('THINK_VERSION')){
             $versionInfo = explode('.',THINK_VERSION);
             if($versionInfo<5){
                 $this->_model = m($this->_table);
