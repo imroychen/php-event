@@ -279,7 +279,7 @@ class Service
 
     /**
      * 列出事件 详情
-     * @param string $p
+     * @param bool $showEvent
      */
     public function ls($showEvent=false){
         $listeners = $this->_getListeners();
@@ -287,8 +287,10 @@ class Service
 
         $funcList = [];
         $_tmp = get_class_methods($eventCls);
-        foreach ($_tmp as $funcName){
-            $funcList[strtolower($funcName)] = $funcName;
+        if(!empty($_tmp)) {
+            foreach ($_tmp as $funcName) {
+                $funcList[strtolower($funcName)] = $funcName;
+            }
         }
 
         if($showEvent){
