@@ -4,7 +4,6 @@
 namespace iry\e;
 
 use Exception;
-use iry\cli\Cli;
 use ReflectionClass;
 
 class Service
@@ -282,7 +281,7 @@ class Service
      * 列出事件 详情
      * @param string $p
      */
-    public function ls($p=''){
+    public function ls($showEvent=false){
         $listeners = $this->_getListeners();
         $eventCls = App::cfg()->getEventRules();
 
@@ -292,9 +291,11 @@ class Service
             $funcList[strtolower($funcName)] = $funcName;
         }
 
-        if(!empty($p)){
-            $p = trim(strtolower($p));
-            $listeners = isset($listeners[$p])?[$listeners[$p]]:[];
+        if($showEvent){
+            $eventList = array_keys($listeners);
+            $e = Cli::select($eventList);
+            $e = trim(strtolower($eventList[$e]));
+            $listeners = isset($listeners[$e])?[$listeners[$e]]:[];
         }
         if(!empty($listeners)) {
             foreach ($listeners as $event => $sub) {
@@ -326,62 +327,49 @@ class Service
         }
     }
 
-    public function help($argvs){
-        $tpl = implode('  ',$argvs);
-        echo "\n";
-        $this->_print("--ls",'1;33');
-        $this->_printLn("\t\t列出所有事件及监听状态 / List all events and subscription status");
-        $this->_print("\t\teg: ",'0;33');
-        $this->_printLn('php '.str_replace('--help','--ls',$tpl)."\n",'1;30');
-
-        $this->_print("--event:Test",'1;33');
-        $this->_printLn("\t显示Test(指定的)事件及监听状态 / View event information and subscription status");
-        $this->_print("\t\teg: ",'0;33');
-        $this->_printLn('php '.str_replace('--help','--event:test',$tpl)."\n",'1;30');
-
-        $this->_print("--color:y/n",'1;33');
-        $this->_printLn("\tCli模式 是否启用彩色文字 / Output styled information");
-        $this->_print("\t\teg: ",'0;33');
-        $this->_printLn('php '.str_replace('--help','--color:n',$tpl)."\n",'1;30');
-
-        $this->_print("--help",'1;33');
-        $this->_printLn("\t\thelp\n");
+    public function show(){
+        $this->ls(true);
     }
 
-    static public function start($argvs=null){
-        $argvs = (empty($argvs) && isset($_SERVER['argv'])&& is_array($_SERVER['argv']))? $_SERVER['argv']:$argvs;
-
-        $options = [];
-        $len = count($argvs);
-        for($i=1;$i<$len;$i++){
-            if(strpos($argvs[$i],'--')===0){
-                $_tmp = explode(':',$argvs[$i].':');
-                $options[strtolower(trim($_tmp[0]))] = trim($_tmp[1]);
-            }
+    public function help(){
+        $array = [
+            'ls'=>'列出所有事件及监听状态 / List all events and subscription status',
+            'show'=>'显示(指定的)事件及监听状态 / View event information and subscription status',
+            //'color'=>'Cli模式 是否启用彩色文字 / Output styled information',
+            'help'=> '帮助 / Help',
+            'daemon'=>'启动事件服务 / Start Service',
+        ];
+        $keys = array_keys($array);
+        $texts = array_values($array);
+        $sel = Cli::select($texts);
+        if(isset($keys[$sel])){
+            $func = $keys[$sel];
+            $this->$func();
         }
+    }
+
+
+    /**
+     * @param string $cmd ls/help/show/daemon/''
+     */
+    static public function start($cmd='',$cmdTpl=''){
+        $cmd = strtolower(trim($cmd));
 
         /**
          * @var $daemon self
          */
-        $cls = __CLASS__;
-        $daemon = new $cls($options);
 
-        if(isset($options['--ls'])){
-            $daemon->ls();exit;
-        }elseif(isset($options['--event'])){
-            $daemon->ls($options['--event']);exit;
-        }elseif(isset($options['--help'])){
-            $daemon->help($argvs);exit;
-        }
-        //elseif ($cmd==='....'){}//更多参数
-        else {
+        $cls = __CLASS__;
+        $daemon = new $cls();
+        if($cmd==='daemon'){
             $daemon->daemon();
             //echo "5秒后启动监听器守护程序，结束请按 < Ctrl + C >\n";
             //for ($i=5;$i>0;$i--){sleep(1);echo $i."\r"; }
-
             //sleep(5);
-
+        }elseif(strpos('/ls/event/help/','/'.$cmd.'/')>0){
+            $daemon->$cmd();
+        }else{
+            $daemon->help();
         }
-
     }
 }

@@ -20,4 +20,4 @@ require (dirname(__DIR__)).'/start.php';
 iry\e\App::setCfg('\\MyNamespace\\event\\Config');
 //-------------------------
 //启动守护进程
-iry\e\Service::start($argv);
+iry\e\Service::start();
