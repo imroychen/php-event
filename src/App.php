@@ -45,32 +45,7 @@ class App
      */
 
     static public function fire($event,$args,$delay=3,$dependency=0){
-        $checkRes = true;//$this->_checkArgs($args);
-        if($checkRes) {
-            //在不改变原代码结构的情况下，注入自己的代码
-            $cls = self::cfg()->getEventRules();
-            $eventInfo  = method_exists($cls,$event)?$cls::$event():[];
-            if(isset($eventInfo['exec']) && count($eventInfo['exec'])>0){
-                foreach ($eventInfo['exec'] as $cls){
-                    $cls = str_replace('.','\\',$cls);
-                    $_tmp = new $cls();
-                    if(method_exists($_tmp,'exec')){
-                        $_tmp->exec();
-                    }
-                }
-            }
-
-            if ($event) {
-                $data = [
-                    'name' => $event,
-                    'dependency' => $dependency,
-                    'args' => $args
-                ];
-                //$data['args'] = Pool::dataEncode($args);
-                return Pool::add($data,time() + $delay);
-            }
-        }
-        return false;
+        return Fire::event($event,$args,$delay,$dependency);
     }
 
 

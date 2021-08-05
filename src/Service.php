@@ -3,7 +3,6 @@
 
 namespace iry\e;
 
-use Exception;
 use ReflectionClass;
 
 class Service
@@ -129,7 +128,7 @@ class Service
             if(!empty($actions)) {
                 foreach ($actions as $action) {
                     if(isset($tracking[$action]) && $tracking[$action]) {
-
+                        //todo
                     }else{
                         $r = (new $action($event))->exec();
                         if ($r || is_null($r)) {//null 没有返回值当成功处理
@@ -148,6 +147,9 @@ class Service
                     $this->_print( "> skip");
                 }else {
                     $listenerObj = new $cls($task['id'],$event);
+                    /**
+                     * @var $listenerObj Subscriber
+                     */
                     if ($listenerObj->run()) {
                         //记录运行日志 如果上次意外退出，以便接着上次继续运行
                         $this->_recordLastResult($task['id'],$cls);
@@ -354,7 +356,7 @@ class Service
     /**
      * @param string $cmd ls/help/show/daemon/''
      */
-    static public function start($cmd='',$cmdTpl=''){
+    static public function start($cmd=''){
         $cmd = strtolower(trim($cmd));
 
         /**
