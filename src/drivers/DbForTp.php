@@ -18,19 +18,31 @@ class DbForTp extends Db
     protected function _init($args, $rawArgs)
     {
         parent::_init($args, $rawArgs);
+
+        $version = 0;
         if(defined('THINK_VERSION')){
             $versionInfo = explode('.',THINK_VERSION);
-            if($versionInfo<5){
-                $this->_model = m($this->_table);
-            }
+            $versionInfo = array_map('intval',$versionInfo);
+            $version = $versionInfo[0]+round($versionInfo[1])/1000 + round($versionInfo[1])/1000000;
+        }elseif(defined('\\think\\App::VERSION')) {
+            $versionInfo = \think\App::VERSION;
+            $versionInfo = explode('.',$versionInfo);
+            $versionInfo = array_map('intval',$versionInfo);
+            $version = $versionInfo[0]+round($versionInfo[1])/1000 + round($versionInfo[1])/1000000;
         }
 
-        if(!$this->_model){
-            if(class_exists('\\think\\Db')){
+        if($version>0){
+            if($version<5){
+                $this->_model = m($this->_table);
+            }elseif ($version>=5 && $version<5.1){
                 $this->_dbCls = '\\think\\Db'; //TP V5.0.*
-            }else {
+                $this->_model = false;
+            }else{
                 $this->_dbCls = '\\think\\facade\\Db'; //TP >= V5.1
+                $this->_model = false;
             }
+        }else{
+            exit('未知TP版本,请自定义驱动');
         }
     }
 
@@ -40,7 +52,7 @@ class DbForTp extends Db
             return $this->_model->query($sql);//TP V1.*-V3.*
         }else{
             $dbCls = $this->_dbCls;
-            $dbCls::query($sql);
+            return $dbCls::query($sql);
         }
     }
 
