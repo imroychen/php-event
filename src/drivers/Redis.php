@@ -119,7 +119,7 @@ class Redis extends Driver
             $time = current($record);
             $text = key($record);
             if ($time > time()) {
-                $this->setMark($time, true);//修复标记
+                $this->sendEMsg($time, true);//修复标记
             } else {
                 $res = json_decode($text, true);
                 $res = is_array($res) ? $res : [];
@@ -135,11 +135,11 @@ class Redis extends Driver
     }
 
     //========================重写新数据标记方法========================
-    public function getMark(){
+    public function getEMsg(){
         return $this->_redis->get($this->_dataset.'__ir-e-mark');
     }
 
-    public function setMark($time,$compulsory){
+    public function sendEMsg($time,$compulsory){
         $key = $this->_dataset . '__ir-e-mark';
         if($compulsory){
             $this->_redis->set($key, $time);

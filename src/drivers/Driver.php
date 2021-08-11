@@ -85,7 +85,7 @@ abstract class Driver
      * @param bool $compulsory
      * @return string
      */
-    function setMark($time,$compulsory){
+    function sendEMsg($time,$compulsory){
         $f = $this->_markFile;
 
         if($compulsory){
@@ -103,7 +103,7 @@ abstract class Driver
         return true;
     }
 
-    function getMark(){
+    function getEMsg(){
         $f = $this->_markFile;
         $content = file_get_contents($f);
         return intval($content);

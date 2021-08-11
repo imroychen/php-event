@@ -101,6 +101,7 @@ class Service
         elseif (!isset($task['id']) || empty($task['id'])){
             $this->_print("\n\n * Invalid TASK ID \n",'1;37',41); echo "\n";
             print_r($task);
+            return true;
         }
         elseif(!isset($task['name']) || empty($task['name'])){
             $this->_print("\n\n * Invalid TASK (ID:".$task['id'].") AND Auto Remove it",'1;37',41); echo "\n";
@@ -257,9 +258,9 @@ class Service
             $status = self::_runItem();
             if(!$status){
                 echo 'No task 无任务 ['.date('H:i:s')."] \r\n";
-                Pool::setMark(time() + 60, true);//如果没有新的事件发生，将会在60秒后重试
+                Pool::sendEMsg(time() + 60, true);//如果没有新的事件发生，将会在60秒后重试
                 while (1) {
-                    $mark = Pool::getMark();//避免数据库过载
+                    $mark = Pool::getEMsg();//避免读取数据导致服务器过载（特别是使用数据库驱动时候）
                     if ($mark > time()) {
                         sleep(1);
                         echo date('H:i:s') . "\r";
