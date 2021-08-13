@@ -1,0 +1,23 @@
+{
+	"name": "iry/php-event",
+	"description": "A simple php event engine to reduce the coupling between project modules.(一个简单php事件引擎，以便解耦项目中的各模块)",
+	"type": "library",
+	"license": "MIT",
+	"authors": [
+		{
+			"name": "RoyChen",
+			"email": "hi@imroy.cn"
+		}
+	],
+	"require": {
+		"php": ">=5.4.0",
+		"iry/cli": "^1.0",
+      	"ext-json": "*"
+    },
+	"autoload": {
+		"psr-4": {
+			"iry\\e\\": "../src",
+			"MyNamespace\\event\\":"event"
+		}
+	}
+}

@@ -13,8 +13,8 @@ class Config implements \iry\e\Config
      */
     public function getPoolDriver()
     {
-        return '@Sqlite?dsn=sqlite:./database/sqlite.db&table=ir_event_pool';
-        //return '@Redis?host=localhost&port=6379&password=123&key=ir-e-store';
+        //return '@Sqlite?dsn=sqlite:./database/sqlite.db&table=ir_event_pool';
+        return '@Redis?host=localhost&port=6379&password=123&key=ir-e-store';
         //return '\MyNamespace\event\MyDriver'
     }
 
