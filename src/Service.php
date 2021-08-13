@@ -109,7 +109,7 @@ class Service
             return true;
         }
         else{
-            $this->_printLn('EventMsg:// ID:'.$task['id'].' / event:'.$task['name'].' /args:' . json_encode($task['args']) );
+            $this->_printLn('[EventMsg]:// ID:'.$task['id'].' / event:'.$task['name'].' /args:' . json_encode($task['args']) );
 
             if(empty($this->_listeners)){
                 $this->_listeners = $this->_getListeners();
@@ -254,28 +254,40 @@ class Service
 
         $this->_repairLastResult();//如果上次意外退出 尝试修复上次意外退出的的结果
 
-        while ($status){
+        while (!$this->_isTimeout()){
             $status = self::_runItem();
             if(!$status){
                 echo 'No task 无任务 ['.date('H:i:s')."] \r\n";
-                Pool::sendEMsg(time() + 60, true);//如果没有新的事件发生，将会在60秒后重试
-                while (1) {
-                    $mark = Pool::getEMsg();//避免读取数据导致服务器过载（特别是使用数据库驱动时候）
-                    if ($mark > time()) {
-                        sleep(1);
-                        echo date('H:i:s') . "\r";
-                    } else {
-                        echo "New Task 发现新任务\r\n";
-                        $status = true;
-                        break;
-                    }
-
-                    if ($this->_isTimeout()) {
-                        break 2;
-                    }
+                if($this->_listenNewTask()===-1){
+                    //$status = false;
+                    break;
                 }
-            }else{
-                if($this->_isTimeout()){$status = false;}
+            }
+        }
+    }
+
+    /**
+     * @return int|void -1超时;
+     */
+    private function _listenNewTask(){
+        Pool::sendSignal(time() + 60);//
+        $time = Pool::getMinTime();
+        while (1) {
+            $signal = Pool::getSignal();// 避免读取数据导致服务器过载（特别是使用数据库驱动时候）
+            $time = $time<0?$signal:min($time,$signal);
+            if($time<0){
+                echo date('H:i:s')." \r";
+            }elseif ($time > time()) {
+                echo date('H:i:s').'/'.date('H:i:s',$time) . "\r";
+            } else {
+                echo "New Task 发现新任务\r\n";
+                Pool::sendSignal(time() + 3600);//清理信号
+                return 1;
+            }
+            sleep(1);
+
+            if ($this->_isTimeout()) {
+                return -1;
             }
         }
     }
@@ -349,13 +361,23 @@ class Service
         $sel = Cli::select($texts);
         if(isset($keys[$sel])){
             $func = $keys[$sel];
+            if($func==='help'){
+                echo "\n";
+                $i = 1;
+                foreach ($array as $cls => $v) {
+                    echo ($i++).".\t"; sleep(1);
+                    echo __CLASS__ . "::start('$cls')\t\t"; sleep(1);
+                    echo $v."\n\n"; sleep(1);
+                }
+                sleep(5);
+            }
             $this->$func();
         }
     }
 
 
     /**
-     * @param string $cmd ls/help/show/daemon/''
+     * @param string $cmd ls / help / show / daemon / ''
      */
     static public function start($cmd=''){
         $cmd = strtolower(trim($cmd));

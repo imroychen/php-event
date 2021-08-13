@@ -5,7 +5,7 @@ Docs: [中文简体](./README.md), [English](./README-EN.md)
 1). Install using composer. 
 
 ```shell script
-composer require iry/cli
+composer require iry/php-event
 compoer update
 ```
 
@@ -54,8 +54,15 @@ return："string"
 
 return："string",Return a directory path, do not add "/" at the end。 Example：_/tmp_<br><br>
 
+### 3.Srart Service (Service 在命令行下执行)
+参考 [example/daemon.php](example/daemon.php)
+```php
+//启动守护进程
+//$argv为所有的命令行参数 $_SERVER['argv']|| 如果是入口文件 也可使用$argv接收
+iry\e\Service::start($argv);
+```
 
-### 3. Fire EVENT
+### 4. Fire EVENT （Client）
 
 #### Quick way
 ```php

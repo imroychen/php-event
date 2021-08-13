@@ -3,8 +3,6 @@
 
 namespace iry\e\drivers;
 
-use phpseclib3\Net\SFTP\Stream;
-
 /**
  * Redis 驱动
  * @Redis?host=localhost&port=6379&key=ir-e-store&password=123
@@ -109,45 +107,52 @@ class Redis extends Driver
     }
 
     /**
+     * @inheritDoc
+     * @return int
+     */
+    function getMinTime()
+    {
+        $record = $this->_redis->zRange($this->_dataset, 0, 1, true);
+        if(!empty($record)) {
+            $item = current($record);
+            //$r = $this->_redis->zScore($this->_dataset, $item);
+            //return $r*1;
+            return $item*1;
+        }else{
+            return -1;
+        }
+
+    }
+
+    /**
      * 扫描可运行的任务
      */
 
     public function scan()
     {
-        $record = $this->_redis->zRange($this->_dataset, 0, 1, true);
-        if(!empty($record)) {
-            $time = current($record);
-            $text = key($record);
-            if ($time > time()) {
-                $this->sendEMsg($time, true);//修复标记
-            } else {
+        $records = $this->_redis->zRange($this->_dataset, 0, 0, true);
+
+        if(!empty($records)) {
+            foreach ($records as $text=>$score) {
                 $res = json_decode($text, true);
                 $res = is_array($res) ? $res : [];
                 $res['id'] = $text;
-
                 $res['result'] = $this->_getResult($text);
-
-
-                return $res;
+                return  $res;
             }
         }
         return false;
     }
 
-    //========================重写新数据标记方法========================
-    public function getEMsg(){
+
+    //========================重写信号方法========================
+    public function getSignal(){
         return $this->_redis->get($this->_dataset.'__ir-e-mark');
     }
 
-    public function sendEMsg($time,$compulsory){
+    public function sendSignal($time){
         $key = $this->_dataset . '__ir-e-mark';
-        if($compulsory){
-            $this->_redis->set($key, $time);
-        }else {
-            $lastTime = $this->_redis->get($key);
-            $this->_redis->set($key, min($time, intval($lastTime)));
-        }
+        $this->_redis->set($key, $time);
         return true;
     }
-
 }

@@ -72,10 +72,11 @@ class Sqlite extends drivers\Db
 
                 if (!$this->_exist($id)) {
 
-                    $values = '';
-                    $fields = '';
-                    foreach ($data as $f => $v) {
-                        $fields[] = '`' . $f . '`';
+                    $values = [];
+                    $fields = [];
+
+                    foreach ($data as $_field => $v) {
+                        $fields[] = '`' . $_field . '`';
                         $values[] = var_export($v, true);
                     }
                     $fieldsStr = implode(',', $fields);

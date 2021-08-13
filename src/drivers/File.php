@@ -175,6 +175,29 @@ class File extends Driver
         return false;
     }
 
+    /**
+     * @inheritDoc
+     */
+
+    public function  getMinTime()
+    {
+        $fileIdx = $this->_file('@index');
+        $content = file_get_contents($fileIdx);
+        if(strpos($content,'|')!=false){
+            $tmp = explode("\n",$content);
+            $res = time()*2;
+            foreach ($tmp as $v ){
+                if($v!='') {
+                    list($v) = explode('|', $v);
+                    list($id,$execTime) = explode(',', $v.',1');
+                    $res = min($execTime,$res);
+                }
+            }
+            return $res;
+        }
+        return -1;
+    }
+
 
     function setResult($id, $res)
     {

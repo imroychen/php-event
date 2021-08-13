@@ -65,6 +65,12 @@ abstract class Driver
     abstract function setResult($id,$res);
 
     /**
+     * 获取最小的时间
+     * @return int -1：未找到
+     */
+    abstract function getMinTime();
+
+    /**
      * 创建一个唯一ID
      * @param $data
      * @param bool $checkOriginalId
@@ -80,30 +86,23 @@ abstract class Driver
     }
 
     /**
-     * 临时目录 确保 WEB 和 CLI 都能操作该文件
+     * 发送信号给服务端
+     * 如果是文件模拟 请确保该文件 确保 WEB 和 CLI 都能操作该文件
      * @param int $time
-     * @param bool $compulsory
      * @return string
      */
-    function sendEMsg($time,$compulsory){
+    function sendSignal($time){
         $f = $this->_markFile;
-
-        if($compulsory){
-            file_put_contents($f, $time);
-        }else {
-            $content = file_get_contents($f);
-            if (!empty($content)) {
-                $val = min(intval($content), $time);
-            } else {
-                $val = $time;
-            }
-            file_put_contents($f, $val);
-        }
-
+        file_put_contents($f, $time);
         return true;
     }
 
-    function getEMsg(){
+    /**
+     * 接收信号
+     * @return int
+     */
+
+    function getSignal(){
         $f = $this->_markFile;
         $content = file_get_contents($f);
         return intval($content);

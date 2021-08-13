@@ -65,7 +65,7 @@ class Pool
         $data['args']=self::_dataEncode( (isset($data['args'])?$data['args']:[]) );
         $driver = self::_driver();
         $id = $driver->create($data,$time);
-        $driver->sendEMsg($time,false);
+        $driver->sendSignal($time);
 		return $id;//返回ID
 	}
 
@@ -79,12 +79,16 @@ class Pool
 	static function pause($id,$s){
         $time = time()+$s;
         $driver = self::_driver();
-        $driver->sendEMsg($time,false);
 		return $driver->setStartingTime($id,$time);
+        $driver->sendSignal($time);
 	}
 
 	static function setResult($id,$res){
         self::_driver()->setResult($id,serialize($res));
+    }
+
+    static function getMinTime(){
+       return self::_driver()->getMinTime();
     }
 
     /**
@@ -102,12 +106,12 @@ class Pool
         return $r;
     }
 
-    static function sendEMsg($time,$compulsory=false){
-        return self::_driver()->sendEMsg($time,$compulsory);
+    static function sendSignal($time){
+        return self::_driver()->sendSignal($time);
     }
 
-    static function getEMsg(){
-        return intval(self::_driver()->getEMsg());
+    static function getSignal(){
+        return intval(self::_driver()->getSignal());
     }
 
 

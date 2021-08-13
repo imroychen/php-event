@@ -211,6 +211,20 @@ abstract class Db extends Driver
     }
 
     /**
+     * 获取最小是时间
+     *
+     */
+    public function getMinTime(){
+        $data =  $this->_getRecord($this->_sql('select `starting_time` from {{table}} order by `starting_time`'));
+        if(empty($data)){
+            return -1;
+        }else{
+            $time = $data['starting_time']*1;
+            return ($time>0?$time:0);
+        }
+    }
+
+    /**
      * 扫描可运行的任务
      */
 

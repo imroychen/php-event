@@ -9,7 +9,7 @@ Docs: [中文简体](./README.md), [English](./README-EN.md)
 
 
 ```shell script
-composer require iry/cli
+composer require iry/php-event
 compoer update
 ```
 
@@ -37,7 +37,7 @@ iry\e\App::setCfg('\\MyNamespace\\event\\Config');//参数为 Class带命名空�
 namespace \MyNamespace\event;
 class Config implements \iry\e\Config{
    public function getPoolDriver(){}
-   public function getSubscribers(){}
+   public function getSubscribers(){} //return array [class1,class2,....]
    public function getEventRules(){return 'className';}
    public function getTempPath(){return sys_get_temp_dir();}
 
@@ -69,16 +69,17 @@ Config接口请参考: [./src/Config.php](./src/Config.php)<br><br>
 
 返回类型："string",返回一个目录路径的，结尾不要加“/”。 如：_/tmp_<br><br>
 
+---
 
-### 3.启动事件服务
+### 3.启动事件服务(服务端 在命令行下执行)
 参考 [example/daemon.php](example/daemon.php)
 ```php
 //启动守护进程
-//$argv为所有的命令行参数 $_SERVER['argv']|| 如果是入口文件 也可使用$argv接收
+//argv: 'ls' / 'help' / 'show' / 'daemon' / '', default:''
 iry\e\Service::start($argv);
 ```
 
-### 4. 触发事件
+### 4. 触发事件 (客户端)
 
 #### 快捷使用方法
 ```php
