@@ -9,7 +9,7 @@ composer require iry/php-event
 compoer update
 ```
 
-2).Traditional loading: add require_once('php-event PATH/start.php'); to your public file [example](./example/index.php)
+2).Traditional loading: add require_once('php-event PATH/start.php'); to your public file [example](./example/client.php)
 
 # Add configuration
 
@@ -55,7 +55,7 @@ return："string"
 return："string",Return a directory path, do not add "/" at the end。 Example：_/tmp_<br><br>
 
 ### 3.Srart Service (Service 在命令行下执行)
-参考 [example/daemon.php](example/daemon.php)
+参考 [example/service.php](example/service.php)
 ```php
 //启动守护进程
 //$argv为所有的命令行参数 $_SERVER['argv']|| 如果是入口文件 也可使用$argv接收

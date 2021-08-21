@@ -13,7 +13,7 @@ composer require iry/php-event
 compoer update
 ```
 
-②.传统/手动装载：在你的公共代码中加入如下代码   [示例](./example/index.php)
+②.传统/手动装载：在你的公共代码中加入如下代码   [示例](./example/client.php)
 
 ```php
 require_once('... php-event 路径/start.php');
@@ -22,7 +22,7 @@ require_once('... php-event 路径/start.php');
 
 
 ### 2. 配置设置
-在公共文件*`(单入口文件的项目建议在入口文件 )`*中加入如下代码. [示例](./example/index.php)
+在公共文件*`(单入口文件的项目建议在入口文件 )`*中加入如下代码. [示例](./example/client.php)
 
 ```php
 // MyNamespace\event\Config为示例名称请修改自己的Class名称
@@ -72,7 +72,7 @@ Config接口请参考: [./src/Config.php](./src/Config.php)<br><br>
 ---
 
 ### 3.启动事件服务(服务端 在命令行下执行)
-参考 [example/daemon.php](example/daemon.php)
+参考 [example/service.php](example/service.php)
 ```php
 //启动守护进程
 //argv: 'ls' / 'help' / 'show' / 'daemon' / '', default:''
