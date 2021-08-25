@@ -1,4 +1,6 @@
 Docs: [中文简体](./README.md), [English](./README-EN.md)
+# Description
+A simple php event engine to reduce the coupling between project modules.
 ## How to install and use
 <a id="lang-en"></a>
 ## 1.installation

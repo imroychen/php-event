@@ -1,5 +1,6 @@
-## PHP-EVENT 2.0
 Docs: [中文简体](./README.md), [English](./README-EN.md)
+# 简介
+一个简单php异步事件引擎，以便解耦项目中的各模块
 ## 安装和使用
 <a name="lang-zh-cn"></a>
 
