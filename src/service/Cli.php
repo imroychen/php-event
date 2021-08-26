@@ -1,7 +1,7 @@
 <?php
 
 
-namespace iry\e;
+namespace iry\e\service;
 
 /*
 if(class_exists('\iry\cli\Cli')) {

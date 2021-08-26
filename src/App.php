@@ -37,6 +37,7 @@ class App
     }
 
     /**
+     * 废弃
      * @param string $event
      * @param array $args
      * @param int $delay 异步延时
@@ -48,5 +49,9 @@ class App
         return Fire::event($event,$args,$delay,$dependency);
     }
 
+    static function formatEName($name){
+        $name = strtolower(trim($name));
+        return str_replace('_','',$name);
+    }
 
 }

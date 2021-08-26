@@ -5,7 +5,8 @@
  * Time: 20:41
  */
 
-namespace iry\e;
+namespace iry\e\service;
+use iry\e\App;
 
 class Event
 {
@@ -39,7 +40,7 @@ class Event
 
     function __construct($eventName,$args)
     {
-        $this->_eventName = $eventName;//strtolower($eventName);
+        $this->_eventName = $eventName;//App::formatEName($eventName);//strtolower($eventName);
         $eventCfgCls = App::cfg()->getEventRules();
 
         if(!empty($eventCfgCls) && method_exists($eventCfgCls,$this->_eventName)) {

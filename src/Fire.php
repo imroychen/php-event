@@ -40,8 +40,9 @@ class Fire
      */
 
     static public function event($event,$args,$delay=2,$dependency=0){
-        $checkRes = true;//$this->_checkArgs($args);
-        if($checkRes) {
+        $event = App::formatEName($event);
+        $argsIsValid = true;//$this->_checkArgs($args);
+        if($argsIsValid) {
             //在不改变原代码结构的情况下，注入自己的代码
             $cls = App::cfg()->getEventRules();
             $eventInfo  = method_exists($cls,$event)?$cls::$event():[];

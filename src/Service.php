@@ -2,8 +2,8 @@
 
 
 namespace iry\e;
-
-use ReflectionClass;
+use iry\e\service\Event;
+use iry\e\service\Cli;
 
 class Service
 {
@@ -115,9 +115,9 @@ class Service
                 $this->_listeners = $this->_getListeners();
                 $this->_listeners['__']='';//防止没有数据每次都重新分析
             }
-            $eventName = $task['name'];
-            $nameLower = strtolower($eventName);
-            $listeners = (isset($this->_listeners[$nameLower])&& is_array($this->_listeners[$nameLower]))? $this->_listeners[$nameLower]: [];
+
+            $rawEName = App::formatEName($task['name']);
+            $listeners = (isset($this->_listeners[$rawEName])&& is_array($this->_listeners[$rawEName]))? $this->_listeners[$rawEName]: [];
             $this->_printLn("\tListeners:".(empty($listeners)?'none':implode(',',array_keys($listeners))));
 
             $tracking = $task['result'];//如果上次意外退出，接着上次继续运行
@@ -155,9 +155,9 @@ class Service
                         //记录运行日志 如果上次意外退出，以便接着上次继续运行
                         $this->_recordLastResult($task['id'],$cls);
                         unset($progress[$cls]);
-                        $this->_print( "> ok");
+                        $this->_printLn( "> ok");
                     } else {
-                        $this->_print( "> false");
+                        $this->_printLn( "> false");
                     }
                 }
             }
@@ -220,13 +220,14 @@ class Service
                 $cls = preg_replace('/^class\.|(\.class)*\.php$/i','',$cls);
                 //if($cls::__check__()) {
                     //try {
-                    $obj = new ReflectionClass($cls);
+                    $obj = new \ReflectionClass($cls);
                     $methods = $obj->getMethods();
                     //var_export($methods);
                     foreach ($methods as $m) {
                         $nameLower = strtolower($m->name);
                         if (strpos($nameLower, '_on') === 0) {
                             $eventName = substr($nameLower, 3);
+                            $eventName = App::formatEName($eventName);
                             if (!isset($res[$eventName])) {
                                 $res[$eventName] = [];
                             }
