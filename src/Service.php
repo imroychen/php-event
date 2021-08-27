@@ -309,14 +309,26 @@ class Service
             }
         }
 
+        $eventList = [];
+        if(!empty($listeners)){
+            foreach ($listeners as $event=>$val){
+                $eventList[$event]=$event;
+            }
+            $eventList = array_merge($eventList,$funcList);
+            foreach ($eventList as $key=>$res){
+                if(strpos($key,'_')===0)unset($eventList[$key]);
+            }
+        }
+
         if($showEvent){
             $eventList = array_keys($listeners);
             $e = Cli::select($eventList);
             $e = trim(strtolower($eventList[$e]));
-            $listeners = isset($listeners[$e])?[$listeners[$e]]:[];
+            $eventList = isset($eventList[$e])?[$eventList[$e]]:[];
         }
-        if(!empty($listeners)) {
-            foreach ($listeners as $event => $sub) {
+        //不支持画表格
+        if(!class_exists('\\iry\\cli\\cmp\\Table')) {
+            foreach ($eventList as $event => $EName) {
 
                 $cfg = [];
                 if (method_exists($eventCls, $event)) {
@@ -325,7 +337,6 @@ class Service
 
                 $this->_print("\n+------------------------------------------\n");
                 $this->_print( " " . (isset($funcList[$event]) ? $funcList[$event] : $event) . " :",'0;33');
-
                 $this->_print( "\t" . (empty($cfg) ? '--' : json_encode($cfg)) . "\n",'1;30');
 
                 if(!empty($cfg['actions'])) {
@@ -333,6 +344,7 @@ class Service
                     $str = implode('\t\n', $cfg['actions']);
                     $this->_print( $str . "\n\n");
                 }
+                $sub = isset($listeners[$event])?$listeners[$event]:[];
                 if(!empty($sub)) {
                     $this->_print( "\n\tSubscriber:",'0;32');
                     foreach ($sub as $cls => $func) {
@@ -342,6 +354,69 @@ class Service
                 $this->_print( "\n");
             }
             $this->_print( "\n+------------------------------------------\n");
+
+        }
+        //画表格
+        else {
+            $tab = new \iry\cli\cmp\Table();
+
+            $tab->setHeader(['Event <事件名>', 'Args <参数>  *:Require ', 'Actions <绑定的动作>', 'Subscriber <订阅者>', 'Exec <同步注入>']);
+            $lastEvent = end($eventList);
+            foreach ($eventList as $e => $EName) {
+                $sub = $action = $exec = $args = [];
+
+                if (isset($listeners[$e]) && !empty($listeners[$e])) {
+                    $sub = array_keys($listeners[$e]);
+                }
+
+                if (method_exists($eventCls, $e)) {
+                    $cfg = $eventCls::$e();
+                    if (!empty($cfg['actions'])) {
+                        $action = $cfg['actions'];
+                        sort($action);
+                    }
+                    if (!empty($cfg['exec'])) {
+                        $exec = $cfg['exec'];
+                        sort($exec);
+                    }
+
+                    $_args = [];
+                    if (!empty($cfg['args'])) {
+                        $_args = array_combine($cfg['args'], $cfg['args']);
+                    }
+                    if (isset($cfg['requires']) && !empty($cfg['requires'])) {
+                        $_val = array_map(function ($v) { return '* ' . $v;}, $cfg['requires']);
+                        $_args = array_merge($_args, array_combine($cfg['requires'], $_val));
+                        $_args = array_values($_args);
+                    }
+
+                    $args = [];
+                    $argsLen = count($_args);
+                    if ($argsLen > 3) {
+                        for ($i = 0; $i < $argsLen; $i += 3) {
+                            $splice = array_splice($_args, $i, 3);
+                            $args[] = implode(' , ', $splice);
+                        }
+                    }else{ $args = [implode(' , ', $_args)];}
+                }
+
+                $len = max(1, count($args), count($action), count($sub), count($exec));
+
+                for ($i = 0; $i < $len; $i++) {
+                    $tab->addRow([
+                        $EName,
+                        (isset($args[$i]) ? $args[$i] : ''),
+                        (isset($action[$i]) ? $action[$i] : ''),
+                        (isset($sub[$i]) ? $sub[$i] : ''),
+                        (isset($exec[$i]) ? $exec[$i] : '')
+                    ]);
+                }
+
+                if ($lastEvent != $EName) {
+                    $tab->addRow('-');
+                }
+            }
+            echo "\n" . $tab->render();
         }
     }
 
