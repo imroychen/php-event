@@ -2,8 +2,6 @@
 1. Db：该驱动 不可直接使用 需要你自己创建一个class 去实现 _query 和 _exec两个方法
 
 2. Redis _<u>Redis?host=localhost&port=3307&dataset=key</u>_
-
-3. File _<u>File?path=绝对路径</u>_
 ----
 3. 如果使用了框架Laravel ，且准备使用数据库作为事件消息存储. 你可以直接使用DbForLaravel驱动 用法'<u>@DbForLaravel?table=表名</u>'
 

@@ -4,7 +4,7 @@
 namespace iry\e;
 
 
-interface Config
+interface Setting
 {
 
     /**

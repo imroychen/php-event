@@ -26,10 +26,10 @@ require_once('... php-event 路径/start.php');
 在公共文件*`(单入口文件的项目建议在入口文件 )`*中加入如下代码. [示例](./example/client.php)
 
 ```php
-// MyNamespace\event\Config为示例名称请修改自己的Class名称
-iry\e\App::setCfg('\\MyNamespace\\event\\Config');//参数为 Class带命名空间的全名称
+// MyNamespace\event\Setting为示例名称请修改自己的Class名称
+iry\e\App::setCfg('\\MyNamespace\\event\\Setting');//参数为 Class带命名空间的全名称
 
-//iry\e\App::setCfg(\MyNamespace\event\Config::class);//如果php版本>= 5.5 也可以这样
+//iry\e\App::setCfg(\MyNamespace\event\Setting::class);//如果php版本>= 5.5 也可以这样
 ```
 
 ### 3. 创建 Class \\MyNamespace\event\\Config
