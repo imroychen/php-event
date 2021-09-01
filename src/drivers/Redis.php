@@ -146,6 +146,9 @@ class Redis extends Driver
 
 
     //========================重写信号方法========================
+    public function initSignal(){
+       //无需做
+    }
     public function getSignal(){
         return $this->_redis->get($this->_dataset.'__ir-e-mark');
     }

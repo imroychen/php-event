@@ -248,6 +248,7 @@ class Service
      * @param $limitTime
      */
     public function daemon($limitTime=-1){
+        Pool::initSignal();
         $status = true;
         $this->_timeout = time()+$limitTime;
         $this->_enableTimeoutCtrl = ($limitTime>0);

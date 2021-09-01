@@ -106,6 +106,10 @@ class Pool
         return $r;
     }
 
+    static function initSignal(){
+
+    }
+
     static function sendSignal($time){
         return self::_driver()->sendSignal($time);
     }

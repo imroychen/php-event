@@ -85,6 +85,14 @@ abstract class Driver
         return strtolower(substr(md5($str), 8, 16));
     }
 
+    function initSignal(){
+        $f = $this->_markFile;
+        if(!file_exists($f)){
+            file_put_contents($f,'');
+        }
+        chmod($f,0666);
+    }
+
     /**
      * 发送信号给服务端
      * 如果是文件模拟 请确保该文件 确保 WEB 和 CLI 都能操作该文件
