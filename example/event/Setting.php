@@ -51,6 +51,4 @@ class Setting implements \iry\e\Setting
     {
         return sys_get_temp_dir();
     }
-
-
 }

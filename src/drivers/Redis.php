@@ -59,7 +59,7 @@ class Redis extends Driver
     public function remove($id)
     {
         $res = $this->_redis->zRem($this->_dataset, $id);
-        return $res? true:false;
+        return (bool)$res;
     }
 
     /**
@@ -147,7 +147,7 @@ class Redis extends Driver
 
     //========================重写信号方法========================
     public function initSignal(){
-       //无需做
+       //No action required
     }
     public function getSignal(){
         return $this->_redis->get($this->_dataset.'__ir-e-mark');
