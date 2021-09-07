@@ -11,7 +11,7 @@ class Subscriber
     protected $_id = 0;
 
     /**
-     * @var Event
+     * @var service\Event
      */
     protected $_event;
 
