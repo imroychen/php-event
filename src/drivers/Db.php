@@ -156,8 +156,8 @@ abstract class Db extends Driver
             $exist = $this->_exist($id);
 
             if (!$exist) {
-                $fields = '';
-                $values = '';
+                $fields = [];
+                $values = [];
                 foreach ($data as $f => $v) {
                     $fields[] = '`' . $f . '`';
                     $values[] = var_export($v, true);
