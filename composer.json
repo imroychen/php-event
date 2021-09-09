@@ -2,7 +2,7 @@
 	"name": "iry/php-event",
 	"description": "A simple php event engine to reduce the coupling between project modules.(一个简单php事件引擎，以便解耦项目中的各模块)",
 	"type": "library",
-	"license": "Apache2",
+	"license": "Apache-2.0",
 	"keywords": ["php event","event"],
 	"authors": [
 		{
