@@ -16,13 +16,13 @@ compoer update
 # Add configuration
 
 ```php
-iry\e\App::setCfg('\\MyNamespace\\event\\Config');
+iry\e\App::setCfg('\\MyNamespace\\event\\Setting');
 ```
 
-### 3. Create class \\MyNamespace\event\\Config
+### 3. Create class \\MyNamespace\event\\Setting
 ```
 namespace \\MyNamespace\event;
-class Config implements \iry\e\Config{
+class Config implements \iry\e\interfaces\Setting{
    public function getPoolDriver()
    public function getSubscribers(){}
    public function getEventRules(){}
@@ -30,8 +30,8 @@ class Config implements \iry\e\Config{
 
 }
 ```
-Interface : [./src/Config.php](./src/Config.php)<br><br>
-Please refer to the interface docking example: [./example/event/Config.php](./example/event/Config.php)<br><br>
+Interface : [./src/Setting.php](./src/interfaces/Setting.php)<br><br>
+Please refer to the interface docking example: [./example/event/Setting.php](./example/event/Setting.php)<br><br>
 #### 方法
 **public function getPoolDriver()**
 

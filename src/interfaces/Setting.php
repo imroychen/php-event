@@ -1,18 +1,33 @@
 <?php
 
 
-namespace iry\e;
+namespace iry\e\interfaces;
 
 
 interface Setting
 {
 
     /**
-     * Where are the messages stored (example: Redis/Sqlite, Mysql and more DB... )
+     * 当前项目或者设置的名称
+     * The name of the current project or setting
+     *
+     * 多套事件同时使用时 该名称用于隔离
+     * When multiple sets of events are used at the same time, the name is used for isolation
+     *
+     * @return string
+     *  允许 字母、数组、下划线
+     *  Allow letters, arrays, underscores
+     *
+     */
+
+    public function name();
+
+    /**
+     * Where are the messages stored (example: Redis，Sqlite, Mysql and more DB... )
      * Refer to QUERY STRING in the URL for parameter passing method
      * The built-in driver can use @ to omit the namespace of the class
      *
-     * 消息池的驱动 (消息暂存在哪？ 可以是 Redis/DB Sqlite/DB Mysql等等)
+     * 消息池的驱动 (消息暂存在哪？ 可以是 Redis Sqlite/DB Mysql/DB等等)
      * 用法:
      * 类名?参数  参数格式参考 URL中QUERY STRING
      * 内置驱动可以使用@来省略类的命名空间
@@ -35,6 +50,7 @@ interface Setting
      *
      * @return array ['Subscriber Class1','Subscriber Class2']
      */
+
     public function getSubscribers();
 
     /**

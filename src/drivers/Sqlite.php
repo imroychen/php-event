@@ -59,7 +59,7 @@ class Sqlite extends drivers\Db
     private function _asyncCreate($fCnt){
         if(!file_exists($fCnt)){ return false;}
 
-        $f = App::getTempPath('ir-e-sqlite-create-task');
+        $f = App::getTempPath(App::cfg()->name().'-ir-e-sqlite-create-task');
         file_put_contents($f, App::getTempPath(uniqid()));
 
         $cnt = file_get_contents($fCnt);
@@ -90,7 +90,7 @@ class Sqlite extends drivers\Db
     }
 
     private function _getQueueName(){
-        $f = App::getTempPath('ir-e-sqlite-create-task');
+        $f = App::getTempPath(App::cfg()->name().'-ir-e-sqlite-create-task');
         $fCnt = file_get_contents($f);
         if(!$fCnt) {
             $fCnt = App::getTempPath(uniqid());

@@ -10,7 +10,7 @@ abstract class Driver
      * @param $rawArgs
      */
     function __construct($rawArgs){
-        $this->_markFile = App::getTempPath( 'ir-e_event-queue-mark');
+        $this->_markFile = App::getTempPath( App::cfg()->name().'-iry-event-signal-pipeline');
         $_argsArr = explode('&',$rawArgs);
         $args = [];
         if(count($_argsArr)>0) {

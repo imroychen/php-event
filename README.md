@@ -32,11 +32,12 @@ iry\e\App::setCfg('\\MyNamespace\\event\\Setting');//参数为 Class带命名空
 //iry\e\App::setCfg(\MyNamespace\event\Setting::class);//如果php版本>= 5.5 也可以这样
 ```
 
-### 3. 创建 Class \\MyNamespace\event\\Config
+### 3. 创建 Class \\MyNamespace\event\\Setting
 ```php
 <?php
 namespace \MyNamespace\event;
-class Config implements \iry\e\Config{
+class Setting implements \iry\e\interfaces\Setting {
+   public function name(){return 'my_name'}
    public function getPoolDriver(){}
    public function getSubscribers(){} //return array [class1,class2,....]
    public function getEventRules(){return 'className';}
@@ -44,8 +45,8 @@ class Config implements \iry\e\Config{
 
 }
 ```
-Config接口请参考: [./src/Config.php](./src/Config.php)<br><br>
-接口实现示例请参考: [./example/event/Config.php](./example/event/Config.php)<br><br>
+Setting: [./src/interfaces/Setting.php](./src/interfaces/Setting.php)<br><br>
+接口实现示例请参考: [./example/event/Setting.php](./example/event/Setting.php)<br><br>
 #### 方法
 **public function getPoolDriver()**
 

@@ -7,7 +7,7 @@
 namespace iry\e;
 
 
-interface Config extends Setting
+interface Config extends interfaces\Setting
 {
 
 }
