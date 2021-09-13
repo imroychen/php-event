@@ -112,7 +112,13 @@ abstract class Driver
 
     function getSignal(){
         $f = $this->_markFile;
-        $content = file_get_contents($f);
+        try {
+            $content = file_get_contents($f);
+        }catch (\Exception $e){
+            $this->initSignal();
+            $content = '';
+        }
+
         return intval($content);
     }
 }

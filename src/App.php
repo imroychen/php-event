@@ -54,4 +54,19 @@ class App
         return str_replace('_','',$name);
     }
 
+
+    static private $_container_=[];
+    static function setCtnItem($key,$val){
+        if(is_null($val)) unset(self::$_container_[$key]);
+        self::$_container_[$key] = $val;
+    }
+
+    static function getCtnItem($key,$default,$filter=null){
+        $val =  isset(self::$_container_[$key])?$default:self::$_container_[$key];
+        if(is_callable($filter)){
+            return get_called_class($filter,$val);
+        }
+        return $val;
+    }
+
 }

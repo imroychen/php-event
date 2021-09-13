@@ -109,6 +109,7 @@ class Service
             return true;
         }
         else{
+            $_t = microtime(true);
             $this->_printLn('[EventMsg]:// ID:'.$task['id'].' / event:'.$task['name'].' /args:' . json_encode($task['args']) );
 
             if(empty($this->_listeners)){
@@ -120,6 +121,7 @@ class Service
             $listeners = (isset($this->_listeners[$rawEName])&& is_array($this->_listeners[$rawEName]))? $this->_listeners[$rawEName]: [];
             $this->_printLn("\tListeners:".(empty($listeners)?'none':implode(',',array_keys($listeners))));
 
+            App::setCtnItem('#STURCTURE',(isset($task['args']) && isset($task['args']['#structure']))?$task['args']['#structure']:'');
             $tracking = $task['result'];//如果上次意外退出，接着上次继续运行
             $progress = $listeners; //记录进度
             $event = new Event($task['name'],$task['args']);
@@ -168,6 +170,11 @@ class Service
             }
 
             //有下一页
+            App::setCtnItem('#STURCTURE','');
+            $runTime = microtime(true)-$_t;
+            if($runTime>3){
+                echo "***  Running time is too long ***";
+            }
             return true;
         }
 
