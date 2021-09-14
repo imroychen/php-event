@@ -16,7 +16,7 @@ class Service
     private $_trackingResultLog = '';
     public function __construct($options = [])
     {
-        $this->_trackingResultLog = App::getTempPath(App::cfg()->name().'-iry-event-mark');
+        $this->_trackingResultLog = App::getTempPath(App::cfg()->name().'-iry-event-result-tracking');
         if(!empty($options)){
             $this->_colorStyle = (isset($options['--color']) && strtolower($options['--color'])==='n')?false:true;
             if($this->_colorStyle && strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
@@ -286,7 +286,7 @@ class Service
             $time = $time<0?$signal:min($time,$signal);
             if($time<0){
                 echo date('H:i:s')." \r";
-            }elseif ($time > time()) {
+            }elseif ($time >= time()) {
                 echo date('H:i:s').'/'.date('H:i:s',$time) . "\r";
             } else {
                 echo "New Task 发现新任务\r\n";

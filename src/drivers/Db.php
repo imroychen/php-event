@@ -166,12 +166,14 @@ abstract class Db extends Driver
                 $valuesStr = implode(',',$values);
                 $res = $this->_exec($this->_sql('insert into {{table}} (' . $fieldsStr . ') values (' . $valuesStr.')'),'insert');
                 return $res ? $id:false;
+            }else{
+                $this->setStartingTime($id,$time);
             }
-
             return $id;
         }
         return false;
     }
+
 
     /**
      * 检查事件消息否存在
@@ -220,7 +222,7 @@ abstract class Db extends Driver
             return -1;
         }else{
             $time = $data['starting_time']*1;
-            return ($time>0?$time:0);
+            return ($time>0?$time:(time()-1));
         }
     }
 
