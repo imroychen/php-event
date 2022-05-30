@@ -209,7 +209,7 @@ abstract class Db extends Driver
     public function setResult($id,$res){
         $id = var_export(strval($id),true);
         $res = var_export(strval($res),true);
-        $this->_exec($this->_sql('update {{table}} set `result`='.$res.' where `id`='.$id ), 'update' );
+        //$this->_exec($this->_sql('update {{table}} set `result`='.$res.' where `id`='.$id ), 'update' );
     }
 
     /**

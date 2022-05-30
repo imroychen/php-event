@@ -84,7 +84,7 @@ class Pool
 	}
 
 	static function setResult($id,$res){
-        self::_driver()->setResult($id,serialize($res));
+        self::_driver()->setResult($id,self::_dataEncode($res));
     }
 
     static function getMinTime(){
@@ -100,7 +100,7 @@ class Pool
         $r = self::_driver()->scan();
         if(!empty($r) && $r['id']) {
             $r['args'] = self::_dataDecode($r['args']);
-            $r['result'] = (isset($r['result']) && !empty($r['result']))? unserialize($r['result']):[];
+            $r['result'] = (isset($r['result']) && !empty($r['result']))? self::_dataDecode($r['result']):[];
             Pool::pause($r['id'], 20);
         }
         return $r;
